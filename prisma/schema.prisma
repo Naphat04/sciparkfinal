@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// --- IDENTITY & RBAC ---
+
+// Enums replaced with String for SQLite compatibility:
+// UserRole: "SUPER_ADMIN", "PROJECT_MANAGER", "PARTICIPANT", "JUDGE"
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String?
+  role          String    @default("PARTICIPANT")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  participant   Participant?
+  managedProjects Project[] @relation("ProjectManager")
+  evaluations   Evaluation[]
+}
+
+// --- PARTICIPANT MANAGEMENT ---
+
+// ParticipantType: "STUDENT", "LECTURER", "RESEARCHER", "ENTREPRENEUR"
+model Participant {
+  id               String          @id @default(cuid())
+  userId           String          @unique
+  user             User            @relation(fields: [userId], references: [id])
+  type             String
+  
+  studentProfile      StudentProfile?
+  lecturerProfile     LecturerProfile?
+  researcherProfile   ResearcherProfile?
+  entrepreneurProfile EntrepreneurProfile?
+
+  teamMemberships  TeamMember[]
+  
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model StudentProfile {
+  id            String      @id @default(cuid())
+  participantId String      @unique
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  studentId     String      @unique
+  faculty       String
+  program       String
+  year          Int
+}
+
+model LecturerProfile {
+  id            String      @id @default(cuid())
+  participantId String      @unique
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  faculty       String
+  position      String
+}
+
+model ResearcherProfile {
+  id            String      @id @default(cuid())
+  participantId String      @unique
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  organization  String
+  researchField String
+}
+
+model EntrepreneurProfile {
+  id            String      @id @default(cuid())
+  participantId String      @unique
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  companyName   String
+  businessType  String
+}
+
+// --- PROJECT & TEAM MANAGEMENT ---
+
+// ProjectStatus: "DRAFT", "ACTIVE", "COMPLETED", "CANCELLED"
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  status      String        @default("DRAFT")
+  budget      Float?        @default(0)
+  
+  managerId   String
+  manager     User          @relation("ProjectManager", fields: [managerId], references: [id])
+  
+  teams       Team[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+// TeamStatus: "PENDING", "APPROVED", "REJECTED"
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  status      String       @default("PENDING")
+  leaderId    String       // Tracks the participantId of the team creator
+  
+  members     TeamMember[]
+  proposals   Proposal[]
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+// TeamRole: "LEADER", "MEMBER", "ADVISOR"
+model TeamMember {
+  id            String      @id @default(cuid())
+  teamId        String
+  team          Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  
+  role          String      @default("MEMBER")
+  
+  @@unique([teamId, participantId])
+}
+
+// --- SUBMISSION & EVALUATION ---
+
+// ProposalStatus: "DRAFT", "SUBMITTED", "UNDER_REVIEW", "APPROVED", "REJECTED"
+model Proposal {
+  id            String         @id @default(cuid())
+  teamId        String
+  team          Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  fileUrl       String?        
+  status        String         @default("DRAFT")
+  submittedAt   DateTime?
+  
+  evaluations   Evaluation[]
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Evaluation {
+  id          String      @id @default(cuid())
+  proposalId  String
+  proposal    Proposal    @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  
+  judgeId     String
+  judge       User        @relation(fields: [judgeId], references: [id])
+  
+  score       Int         
+  comment     String?
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([proposalId, judgeId])
+}
