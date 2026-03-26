@@ -7,13 +7,12 @@ export async function createEvaluation(data: {
   comments?: string
 }) {
   return await prisma.$transaction(async (tx) => {
-    // 1. Create the evaluation
     const evaluation = await tx.evaluation.create({
       data: {
         proposalId: data.proposalId,
         judgeId: data.judgeId,
         score: data.score,
-        comments: data.comments
+        comment: data.comments
       }
     })
 
@@ -43,10 +42,32 @@ export async function getJudgeEvaluations(judgeId: string) {
     include: {
       proposal: {
         include: {
-          team: { select: { name: true } },
-          team_project: { select: { name: true } } // Wait, let me check relation name in schema
+          team: {
+            include: {
+              project: { select: { name: true } }
+            }
+          }
         }
       }
-    }
+    },
+    orderBy: { createdAt: "desc" }
+  })
+}
+
+export async function getAllEvaluations() {
+  return await prisma.evaluation.findMany({
+    include: {
+      judge: { select: { name: true, email: true } },
+      proposal: {
+        include: {
+          team: {
+            include: {
+              project: { select: { id: true, name: true } }
+            }
+          }
+        }
+      }
+    },
+    orderBy: { createdAt: "desc" }
   })
 }

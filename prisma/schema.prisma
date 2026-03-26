@@ -92,6 +92,7 @@ model Project {
   endDate     DateTime
   status      String        @default("DRAFT")
   budget      Float?        @default(0)
+  maxTeams    Int?          @default(0)
   
   managerId   String
   manager     User          @relation("ProjectManager", fields: [managerId], references: [id])

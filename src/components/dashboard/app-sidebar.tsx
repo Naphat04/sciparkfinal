@@ -42,34 +42,34 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 const data = {
   navMain: [
     {
-      title: "Dashboard",
+      title: "แผงควบคุม",
       url: "/",
       icon: LayoutDashboard,
     },
     {
-      title: "Projects",
+      title: "โครงการ",
       url: "/projects",
       icon: Briefcase,
     },
     {
-      title: "Teams",
+      title: "ทีม",
       url: "/teams",
       icon: Users,
     },
     {
-      title: "Participants",
+      title: "ผู้เข้าร่วม",
       url: "/participants",
       icon: GraduationCap,
     },
   ],
   navSecondary: [
     {
-      title: "Proposals",
+      title: "ข้อเสนอโครงการ",
       url: "/proposals",
       icon: FileText,
     },
     {
-      title: "Evaluations",
+      title: "การประเมิน",
       url: "/evaluations",
       icon: BarChart,
     },
@@ -77,7 +77,7 @@ const data = {
   user: {
     name: "Admin User",
     email: "admin@scipark.university",
-    avatar: "/avatars/admin.png",
+    avatar: "", // Removed broken path to prevent 404
   },
 }
 
@@ -91,6 +91,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton 
               size="lg" 
+              nativeButton={false}
               render={
                 <Link href="/">
                   <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
@@ -98,7 +99,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">Sci-Park</span>
-                    <span className="truncate text-xs">Innovation Portal</span>
+                    <span className="truncate text-xs text-muted-foreground uppercase tracking-widest font-black opacity-60">ระบบจัดการนวัตกรรม</span>
                   </div>
                 </Link>
               }
@@ -110,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {/* Core Management */}
         <SidebarGroup>
-          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] uppercase font-black tracking-widest opacity-50">เมนูหลัก</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {data.navMain.map((item) => (
@@ -118,6 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton 
                     tooltip={item.title}
                     isActive={pathname === item.url || (item.url !== "/" && pathname?.startsWith(item.url))}
+                    nativeButton={false}
                     render={
                       <Link href={item.url}>
                         <item.icon />
@@ -133,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         {/* Workflow */}
         <SidebarGroup>
-          <SidebarGroupLabel>Workflow</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] uppercase font-black tracking-widest opacity-50">กระบวนการทำงาน</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {data.navSecondary.map((item) => (
@@ -141,6 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton 
                     tooltip={item.title}
                     isActive={pathname?.startsWith(item.url)}
+                    nativeButton={false}
                     render={
                       <Link href={item.url}>
                         <item.icon />
@@ -186,8 +189,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <DropdownMenuItem 
                   render={
                     <Link href="/settings" className="flex items-center gap-2">
-                       <Settings className="size-4" />
-                       <span>Settings</span>
+                        <Settings className="size-4" />
+                        <span>ตั้งค่าระบบ</span>
                     </Link>
                   }
                 />
@@ -195,7 +198,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   render={
                     <div className="flex items-center gap-2">
                       <HelpCircle className="size-4" />
-                      <span>Support</span>
+                      <span>ศูนย์ช่วยเหลือ</span>
                     </div>
                   }
                 />
@@ -205,7 +208,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   render={
                     <div className="flex items-center gap-2">
                       <LogOut className="size-4" />
-                      <span>Log out</span>
+                      <span>ออกจากระบบ</span>
                     </div>
                   }
                 />

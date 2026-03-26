@@ -74,12 +74,14 @@ export function SubmitProposalModal({ teamId, teamName }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create Proposal
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button size="sm">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Proposal
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-[500px] border-none shadow-2xl bg-card">
         <DialogHeader>
            <div className="bg-primary/10 text-primary w-fit p-3 rounded-full mb-2">

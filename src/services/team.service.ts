@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma"
-import { TeamRole } from "@prisma/client"
 
 export async function createTeam(data: {
   name: string
@@ -21,13 +20,23 @@ export async function createTeam(data: {
   })
 }
 
-export async function addMemberToTeam(teamId: string, participantId: string, role: TeamRole = "MEMBER") {
+export async function addMemberToTeam(teamId: string, participantId: string, role: string = "MEMBER") {
   return await prisma.teamMember.create({
     data: {
       teamId,
       participantId,
       role
     }
+  })
+}
+
+export async function getAllTeams() {
+  return await prisma.team.findMany({
+    include: {
+      project: { select: { id: true, name: true } },
+      _count: { select: { members: true, proposals: true } }
+    },
+    orderBy: { createdAt: "desc" }
   })
 }
 

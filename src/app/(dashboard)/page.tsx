@@ -7,8 +7,8 @@ import { Separator } from "@/components/ui/separator"
 import * as dashboardService from "@/services/dashboard.service"
 
 export const metadata: Metadata = {
-  title: "Dashboard | Sci-Park",
-  description: "Enterprise Innovation Management Dashboard",
+  title: "แผงควบคุมหลัก | Sci-Park",
+  description: "ระบบบริหารจัดการนวัตกรรมองค์กร",
 }
 
 function StatCard({ title, icon: Icon, value, description, color }: any) {
@@ -42,16 +42,16 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
+          <h1 className="text-3xl font-bold tracking-tight">ภาพรวมระบบ</h1>
           <p className="text-muted-foreground">
-            Welcome back to the Sci-Park administration portal.
+            ยินดีต้อนรับเข้าใช้งานระบบบริหารจัดการ Sci-Park
           </p>
         </div>
         <div className="flex gap-2">
-            <Button variant="outline">Download Report</Button>
+            <Button variant="outline">ดาวน์โหลดรายงาน</Button>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />
-              New Project
+              สร้างโครงการใหม่
             </Button>
         </div>
       </div>
@@ -60,31 +60,31 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard 
-          title="Total Projects" 
+          title="โครงการทั้งหมด" 
           icon={Briefcase} 
           value={stats.totalProjects} 
-          description="+12% from last month"
+          description="+12% จากเดือนที่แล้ว"
           color="text-primary border-primary/20"
         />
         <StatCard 
-          title="Active Projects" 
+          title="โครงการที่ดำเนินการอยู่" 
           icon={Activity} 
           value={stats.activeProjects} 
-          description="Projects in execution status"
+          description="โครงการที่อยู่ระหว่างการดำเนินงาน"
           color="text-green-500 border-green-500/20"
         />
         <StatCard 
-          title="Total Teams" 
+          title="ทีมทั้งหมด" 
           icon={Users} 
           value={stats.totalTeams} 
-          description="+5 newly registered teams"
+          description="+5 ทีมที่ลงทะเบียนใหม่"
           color="text-blue-500 border-blue-500/20"
         />
         <StatCard 
-          title="Total Participants" 
+          title="ผู้เข้าร่วมทั้งหมด" 
           icon={GraduationCap} 
           value={stats.totalParticipants} 
-          description="Researchers and students"
+          description="นักวิจัยและนักศึกษาในระบบ"
           color="text-orange-500 border-orange-500/20"
         />
       </div>
@@ -92,23 +92,23 @@ export default async function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
         <Card className="md:col-span-4 border-none shadow-sm bg-card/50">
           <CardHeader>
-            <CardTitle className="text-lg">Recent Registration Activity</CardTitle>
+            <CardTitle className="text-lg">กิจกรรมการลงทะเบียนล่าสุด</CardTitle>
             <CardDescription>
-              A visual overview of the latest innovation teams that joined.
+              ภาพรวมของทีมชุดนวัตกรรมล่าสุดที่เข้าร่วมในระบบ
             </CardDescription>
           </CardHeader>
           <CardContent className="h-[250px] flex items-center justify-center border-t border-dashed rounded-lg m-4 mt-0 bg-muted/10">
             <span className="text-muted-foreground text-sm italic">
-                Analytics charting and timeline under development.
+                แผนภูมิวิเคราะห์และไทม์ไลน์อยู่ระหว่างการพัฒนา
             </span>
           </CardContent>
         </Card>
         
         <Card className="md:col-span-3 border-none shadow-sm bg-card/50">
           <CardHeader>
-            <CardTitle className="text-lg">Platform Status</CardTitle>
+            <CardTitle className="text-lg">สถานะแพลตฟอร์ม</CardTitle>
             <CardDescription>
-              Overall system health and critical alerts.
+              สุขภาพโดยรวมของระบบและการแจ้งเตือนที่สำคัญ
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -118,8 +118,8 @@ export default async function DashboardPage() {
                   <Activity className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-semibold">API Performance</div>
-                  <div className="text-xs text-muted-foreground">Optimal latency (45ms AVG)</div>
+                  <div className="text-sm font-semibold">ประสิทธิภาพ API</div>
+                  <div className="text-xs text-muted-foreground">ความหน่วงปกติ (เฉลี่ย 45ms)</div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -127,14 +127,14 @@ export default async function DashboardPage() {
                     <Users className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
-                    <div className="text-sm font-semibold">User Onboarding</div>
-                    <div className="text-xs text-muted-foreground">Stable traffic (1.2k unique/day)</div>
+                    <div className="text-sm font-semibold">การเข้าใช้งานของผู้ใช้</div>
+                    <div className="text-xs text-muted-foreground">ปริมาณการใช้งานคงที่ (1.2k ราย/วัน)</div>
                 </div>
               </div>
               <Separator className="my-2" />
               <div className="bg-primary/5 border border-primary/10 rounded-lg p-3">
-                 <div className="text-xs font-semibold text-primary uppercase tracking-tighter mb-1">Upcoming Deadline</div>
-                 <div className="text-sm">Proposal submissions for Smart City close in 2 days.</div>
+                 <div className="text-xs font-semibold text-primary uppercase tracking-tighter mb-1">ครบกำหนดเร็วๆ นี้</div>
+                 <div className="text-sm">การส่งข้อเสนอโครงการสำหรับ Smart City จะปิดในอีก 2 วัน</div>
               </div>
             </div>
           </CardContent>

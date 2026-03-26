@@ -8,7 +8,8 @@ import {
   UserPlus, 
   ExternalLink,
   MoreHorizontal,
-  Download
+  Download,
+  Briefcase
 } from "lucide-react"
 import Link from "next/link"
 
@@ -30,34 +31,40 @@ import { SubmitProposalModal } from "@/components/features/submit-proposal-modal
 import { SubmitProposalAction } from "@/components/features/proposal-actions"
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const team = await teamService.getTeamById(params.id)
+  const resolvedParams = await params
+  const team = await teamService.getTeamById(resolvedParams.id)
   return {
     title: `${team?.name || "Team"} Detail | Sci-Park`,
   }
 }
 
 export default async function TeamDetailPage({ params }: Props) {
-  const team = await teamService.getTeamById(params.id)
+  const resolvedParams = await params
+  const team = await teamService.getTeamById(resolvedParams.id)
 
   if (!team) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] gap-4">
         <div className="text-xl font-semibold opacity-50 italic">Team not found</div>
-        <Button variant="outline" asChild>
-          <Link href="/projects">
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to Projects
-          </Link>
-        </Button>
+        <Button 
+          variant="outline" 
+          nativeButton={false}
+          render={
+            <Link href="/projects">
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Back to Projects
+            </Link>
+          }
+        />
       </div>
     )
   }
 
-  const leader = team.members.find(m => m.role === "LEADER")
+  const leader = team.members.find((m: any) => m.role === "LEADER")
 
   return (
     <div className="flex flex-col gap-6">
@@ -184,12 +191,18 @@ export default async function TeamDetailPage({ params }: Props) {
                                       </div>
                                    )}
                                    {proposal.fileUrl && (
-                                       <Button variant="ghost" size="xs" className="h-6 text-[10px] opacity-70" asChild>
-                                          <a href={proposal.fileUrl} target="_blank" rel="noreferrer">
-                                             <Download className="h-3 w-3 mr-1" />
-                                             Resource
-                                          </a>
-                                       </Button>
+                                       <Button 
+                                          variant="ghost" 
+                                          size="xs" 
+                                          className="h-6 text-[10px] opacity-70" 
+                                          nativeButton={false}
+                                          render={
+                                            <a href={proposal.fileUrl} target="_blank" rel="noreferrer">
+                                               <Download className="h-3 w-3 mr-1" />
+                                               Resource
+                                            </a>
+                                          }
+                                       />
                                    )}
                                 </div>
                              </div>

@@ -19,6 +19,7 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -27,30 +28,36 @@ import * as teamService from "@/services/team.service"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const project = await projectService.getProjectById(params.id)
+  const resolvedParams = await params
+  const project = await projectService.getProjectById(resolvedParams.id)
   return {
-    title: `${project?.name || "Project"} | Sci-Park`,
+    title: `${project?.name || "โครงการ"} | Sci-Park`,
   }
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
-  const project = await projectService.getProjectById(params.id)
-  const teams = await teamService.getTeamsByProject(params.id)
+  const resolvedParams = await params
+  const project = await projectService.getProjectById(resolvedParams.id)
+  const teams = await teamService.getTeamsByProject(resolvedParams.id)
 
   if (!project) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] gap-4">
-        <div className="text-xl font-semibold opacity-50 italic">Project not found</div>
-        <Button variant="outline" asChild>
-          <Link href="/projects">
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to Projects
-          </Link>
-        </Button>
+        <div className="text-xl font-semibold opacity-50 italic">ไม่พบข้อมูลโครงการ</div>
+        <Button 
+          variant="outline" 
+          nativeButton={false}
+          render={
+            <Link href="/projects">
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              กลับไปยังหน้าโครงการ
+            </Link>
+          }
+        />
       </div>
     )
   }
@@ -62,19 +69,19 @@ export default async function ProjectDetailPage({ params }: Props) {
         <div className="flex flex-col gap-2">
           <Link href="/projects" className="text-sm text-muted-foreground flex items-center hover:text-primary transition-colors">
             <ChevronLeft className="mr-1 h-3 w-3" />
-            Projects
+            โครงการทั้งหมด
           </Link>
           <div className="flex items-center gap-3">
              <h1 className="text-4xl font-extrabold tracking-tight">{project.name}</h1>
              <Badge variant="outline" className="h-6 px-3 bg-primary/5 text-primary border-primary/20">{project.status}</Badge>
           </div>
           <p className="text-muted-foreground mt-1 max-w-2xl text-lg opacity-80 leading-relaxed font-light">
-             {project.description || "The future of innovation starts here. No detailed description provided."}
+             {project.description || "อนาคตของนวัตกรรมเริ่มต้นที่นี่ ไม่มีการระบุรายละเอียดเพิ่มเติม"}
           </p>
         </div>
         <div className="flex items-center gap-2">
-           <Button variant="outline" size="sm">Edit Details</Button>
-           <Button variant="destructive" size="sm" disabled>Archive</Button>
+           <Button variant="outline" size="sm">แก้ไขรายละเอียด</Button>
+           <Button variant="destructive" size="sm" disabled>เก็บเข้าจดหมายเหตุ</Button>
         </div>
       </div>
 
@@ -84,7 +91,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       <div className="grid gap-4 md:grid-cols-3">
          <Card className="border-none shadow-sm bg-card/60 backdrop-blur-xs">
            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-             <CardTitle className="text-sm font-medium opacity-60">BUDGET ALLOCATED</CardTitle>
+            <CardTitle className="text-sm font-medium opacity-60">งบประมาณที่ได้รับ</CardTitle>
              <DollarSign className="h-4 w-4 text-green-500" />
            </CardHeader>
            <CardContent>
@@ -94,7 +101,7 @@ export default async function ProjectDetailPage({ params }: Props) {
          </Card>
          <Card className="border-none shadow-sm bg-card/60 backdrop-blur-xs">
            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-             <CardTitle className="text-sm font-medium opacity-60">TIMELINE</CardTitle>
+            <CardTitle className="text-sm font-medium opacity-60">กรอบระยะเวลา</CardTitle>
              <Calendar className="h-4 w-4 text-primary" />
            </CardHeader>
            <CardContent>
@@ -104,7 +111,7 @@ export default async function ProjectDetailPage({ params }: Props) {
          </Card>
          <Card className="border-none shadow-sm bg-card/60 backdrop-blur-xs">
            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-             <CardTitle className="text-sm font-medium opacity-60">TEAM ENROLLMENT</CardTitle>
+            <CardTitle className="text-sm font-medium opacity-60">จำนวนทีมที่เข้าร่วม</CardTitle>
              <Users className="h-4 w-4 text-blue-500" />
            </CardHeader>
            <CardContent>
@@ -119,13 +126,13 @@ export default async function ProjectDetailPage({ params }: Props) {
       {/* Detailed Tabs Section */}
       <Tabs defaultValue="teams" className="w-full">
         <TabsList className="grid w-full grid-cols-4 lg:w-[600px] mb-4 bg-muted/20">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="overview">ภาพรวม</TabsTrigger>
           <TabsTrigger value="teams" className="relative">
-             Teams
+             ทีม
              {teams.length > 0 && <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground font-bold">{teams.length}</span>}
           </TabsTrigger>
-          <TabsTrigger value="submissions">Submissions</TabsTrigger>
-          <TabsTrigger value="activity">Settings</TabsTrigger>
+          <TabsTrigger value="submissions">ข้อเสนอโครงการ</TabsTrigger>
+          <TabsTrigger value="activity">การตั้งค่า</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -198,7 +205,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                  </div>
               ) : (
                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {teams.map((team) => (
+                    {teams.map((team: any) => (
                        <Card key={team.id} className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card/50 hover:bg-card hover:shadow-lg transition-all group overflow-hidden">
                           <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
                              <Button variant="ghost" size="icon-sm" className="h-8 w-8 hover:bg-muted"><MoreVertical className="h-4 w-4" /></Button>
@@ -209,7 +216,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                                <Badge variant={team.status === "APPROVED" ? "default" : "secondary"} className="h-5 text-[10px] font-bold">
                                   {team.status}
                                </Badge>
-                               <span className="text-[10px] uppercase font-mono tracking-tighter">{team._count.members} Members Enrolled</span>
+                               <span className="text-[10px] uppercase font-mono tracking-tighter">{team._count.members} สมาชิกที่ลงทะเบียน</span>
                             </CardDescription>
                           </CardHeader>
                           <Separator className="opacity-50" />
@@ -227,11 +234,16 @@ export default async function ProjectDetailPage({ params }: Props) {
                                      </div>
                                   )}
                                </div>
-                               <Button size="xs" variant="ghost" asChild>
-                                  <Link href={`/teams/${team.id}`}>
-                                     View Team
-                                  </Link>
-                               </Button>
+                               <Button 
+                                  size="xs" 
+                                  variant="ghost" 
+                                  nativeButton={false}
+                                  render={
+                                    <Link href={`/teams/${team.id}`}>
+                                      รายละเอียดทีม
+                                    </Link>
+                                  }
+                               />
                             </div>
                           </CardContent>
                        </Card>

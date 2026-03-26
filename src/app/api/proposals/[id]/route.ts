@@ -3,7 +3,7 @@ import { withAuth } from "@/lib/api-handler"
 import * as proposalService from "@/services/proposal.service"
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 /**
@@ -13,18 +13,19 @@ export async function PUT(req: NextRequest, { params }: Props) {
   return withAuth(
     req,
     async () => {
+      const { id } = await params
       const body = await req.json()
       const { status, action } = body
 
       // If action is "SUBMIT", use the specialized service function
       if (action === "SUBMIT") {
-        const proposal = await proposalService.submitProposal(params.id)
+        const proposal = await proposalService.submitProposal(id)
         return NextResponse.json(proposal)
       }
 
       // Standard status updates (for Admin/Judge)
       if (status) {
-        const proposal = await proposalService.updateProposalStatus(params.id, status as any)
+        const proposal = await proposalService.updateProposalStatus(id, status as any)
         return NextResponse.json(proposal)
       }
 

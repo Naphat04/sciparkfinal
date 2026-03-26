@@ -101,15 +101,36 @@ async function main() {
       name: "The Green Warriors",
       projectId: project1.id,
       leaderId: participant1.id,
-      status: "APPROVED",
-      members: {
-        createMany: {
-          data: [
-            { participantId: participant1.id, role: "LEADER" },
-            { participantId: participant2.id, role: "MEMBER" }
-          ]
-        }
-      }
+      status: "APPROVED"
+    }
+  })
+
+  // Add members manually due to Prisma team-member relation
+  await prisma.teamMember.create({
+    data: { teamId: team1.id, participantId: participant1.id, role: "LEADER" }
+  })
+  await prisma.teamMember.create({
+    data: { teamId: team1.id, participantId: participant2.id, role: "MEMBER" }
+  })
+
+  // 5. Create a Sample Proposal
+  const proposal1 = await prisma.proposal.create({
+    data: {
+      title: "Blockchain for Sustainability",
+      description: "A decentralized platform to track carbon footprint in the supply chain.",
+      teamId: team1.id,
+      status: "UNDER_REVIEW",
+      fileUrl: "https://example.com/proposal.pdf"
+    }
+  })
+
+  // 6. Create Sample Evaluation
+  await prisma.evaluation.create({
+    data: {
+      proposalId: proposal1.id,
+      judgeId: admin.id,
+      score: 85,
+      comment: "Solid technical approach. Team shows great potential."
     }
   })
 

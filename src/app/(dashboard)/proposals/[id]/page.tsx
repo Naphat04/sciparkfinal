@@ -31,13 +31,14 @@ import prisma from "@/lib/prisma"
 import { ScoreProposalModal } from "@/components/features/score-proposal-modal"
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const proposal = await prisma.proposal.findUnique({ where: { id: params.id } })
+  const resolvedParams = await params
+  const proposal = await prisma.proposal.findUnique({ where: { id: resolvedParams.id } })
   return {
-     title: `${proposal?.title || "Proposal"} | Evaluation`,
+     title: `${proposal?.title || "ข้อเสนอโครงการ"} | การประเมินผล`,
   }
 }
 
@@ -49,9 +50,18 @@ const statusBadgeStyles: any = {
   REJECTED: "bg-red-500/10 text-red-500 border-red-500/20",
 }
 
+const statusThai: Record<string, string> = {
+  DRAFT: "ฉบับร่าง",
+  SUBMITTED: "ส่งแล้ว",
+  UNDER_REVIEW: "อยู่ระหว่างพิจารณา",
+  APPROVED: "ผ่านการอนุมัติ",
+  REJECTED: "ไม่ผ่านการอนุมัติ",
+}
+
 export default async function ProposalEvaluationPage({ params }: Props) {
+  const resolvedParams = await params
   const proposal = await prisma.proposal.findUnique({
-    where: { id: params.id },
+    where: { id: resolvedParams.id },
     include: {
       team: {
         include: {
@@ -64,11 +74,11 @@ export default async function ProposalEvaluationPage({ params }: Props) {
 
   if (!proposal) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 opacity-50 italic">Proposal not found.</div>
+      <div className="flex flex-col items-center justify-center p-20 opacity-50 italic">ไม่พบข้อมูลข้อเสนอโครงการ</div>
     )
   }
 
-  const evaluations = await evaluationService.getEvaluationsByProposal(params.id)
+  const evaluations = await evaluationService.getEvaluationsByProposal(resolvedParams.id)
   const averageScore = evaluations.length > 0 ? evaluations.reduce((acc: number, curr: any) => acc + curr.score, 0) / evaluations.length : null
 
   return (
@@ -77,27 +87,28 @@ export default async function ProposalEvaluationPage({ params }: Props) {
          <div className="flex flex-col gap-1">
             <Link href="/proposals" className="text-xs text-muted-foreground flex items-center hover:text-primary mb-2 transition-colors">
                <ChevronLeft className="h-4 w-4 mr-1" />
-               Submission Queue
+               คิวข้อเสนอโครงการ
             </Link>
             <div className="flex flex-wrap items-center gap-3">
                <h1 className="text-4xl font-extrabold tracking-tight underline decoration-primary/20">{proposal.title}</h1>
                <Badge variant="outline" className={`${statusBadgeStyles[proposal.status]} font-black h-7 text-xs px-4 uppercase tracking-widest`}>
-                  {proposal.status}
+                  {statusThai[proposal.status] || proposal.status}
                </Badge>
             </div>
             <div className="flex items-center gap-2 mt-2">
-                <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground">Team: {proposal.team.name}</span>
-                <span className="text-[10px] text-muted-foreground opacity-50">• Submission ID: {proposal.id}</span>
+                <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground">ทีม: {proposal.team.name}</span>
+                <span className="text-[10px] text-muted-foreground opacity-50">• รหัสการส่ง: {proposal.id}</span>
             </div>
          </div>
          <div className="flex items-center gap-2">
             <Button 
                variant="outline" 
                size="sm" 
+               nativeButton={false}
                render={
                   <a href={proposal.fileUrl || "/"} target="_blank" rel="noreferrer">
                      <Download className="h-4 w-4 mr-2" />
-                     Documentation Resource
+                     เอกสารประกอบโครงการ
                   </a>
                }
             />
@@ -123,11 +134,11 @@ export default async function ProposalEvaluationPage({ params }: Props) {
                 
                 <div className="grid grid-cols-2 gap-4 mt-10 p-6 rounded-3xl bg-muted/20 border border-dashed border-muted-foreground/10">
                     <div className="flex flex-col items-center justify-center p-4 border-r border-dotted">
-                        <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-1 opacity-60">Target Project</span>
+                        <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-1 opacity-60">โครงการที่สมัคร</span>
                         <span className="text-base font-bold text-center underline decoration-primary/20">{proposal.team.project.name}</span>
                     </div>
                     <div className="flex flex-col items-center justify-center p-4">
-                        <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-1 opacity-60">Enrollment Date</span>
+                        <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground mb-1 opacity-60">วันที่ส่งผลงาน</span>
                         <span className="text-base font-bold text-center">{new Date(proposal.createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
@@ -163,11 +174,11 @@ export default async function ProposalEvaluationPage({ params }: Props) {
                                </Avatar>
                                <div className="grid leading-tight">
                                   <span className="text-sm font-bold tracking-tight">{evalItem.judge.name}</span>
-                                  <span className="text-[9px] text-muted-foreground uppercase font-black tracking-widest opacity-60">Committee Judge</span>
+                                  <span className="text-[9px] text-muted-foreground uppercase font-black tracking-widest opacity-60">คณะกรรมการตัดสิน</span>
                                </div>
                              </div>
                              <p className="text-sm text-muted-foreground italic leading-relaxed pl-11 font-light opacity-90 border-l-2 border-primary/10 ml-4">
-                                "{evalItem.comments || "No detailed feedback provided."}"
+                                "{evalItem.comment || "ไม่มีความเห็นเพิ่มเติมสำหรับรายการนี้"}"
                              </p>
                           </div>
                        ))}
@@ -188,7 +199,7 @@ export default async function ProposalEvaluationPage({ params }: Props) {
                     <div className="text-6xl font-black italic tracking-tighter mb-2 group-hover:scale-110 transition-transform origin-left">{averageScore.toFixed(1)}</div>
                     <div className="flex flex-col gap-2">
                         <p className="text-[11px] font-bold opacity-90 flex items-center gap-1.5 uppercase tracking-wide">
-                            <CheckCircle2 className="h-3 w-3" /> Average Score across {evaluations.length} Judges
+                            <CheckCircle2 className="h-3 w-3" /> คะแนนเฉลี่ยจากกรรมการ {evaluations.length} ท่าน
                         </p>
                         <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden mt-1">
                            <div className="bg-white h-full transition-all duration-1000 ease-out" style={{ width: `${averageScore}%` }} />

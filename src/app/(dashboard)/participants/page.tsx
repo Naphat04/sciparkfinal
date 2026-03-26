@@ -18,8 +18,8 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export const metadata: Metadata = {
-  title: "Participants | Sci-Park",
-  description: "Innovation Ecosystem Participants",
+  title: "ผู้เข้าร่วม | Sci-Park",
+  description: "ระบบฐานข้อมูลผู้เข้าร่วมในระบบนิเวศนวัตกรรม",
 }
 
 function getParticipantIcon(type: string) {
@@ -34,10 +34,10 @@ function getParticipantIcon(type: string) {
 
 function getParticipantDetails(participant: any) {
   if (participant.type === "STUDENT") {
-    return `${participant.studentProfile?.program} - Year ${participant.studentProfile?.year}`
+    return `${participant.studentProfile?.program} - ชั้นปีที่ ${participant.studentProfile?.year}`
   }
   if (participant.type === "LECTURER") {
-     return `${participant.lecturerProfile?.position} @ ${participant.lecturerProfile?.faculty}`
+     return `${participant.lecturerProfile?.position} ณ ${participant.lecturerProfile?.faculty}`
   }
   if (participant.type === "RESEARCHER") {
      return `${participant.researcherProfile?.organization} (${participant.researcherProfile?.researchField})`
@@ -49,10 +49,10 @@ function getParticipantDetails(participant: any) {
 }
 
 const typeMap: any = {
-  STUDENT: { label: "Student", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
-  LECTURER: { label: "Lecturer", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
-  RESEARCHER: { label: "Researcher", color: "bg-green-500/10 text-green-500 border-green-500/20" },
-  ENTREPRENEUR: { label: "Entrepreneur", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
+  STUDENT: { label: "นักศึกษา", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+  LECTURER: { label: "อาจารย์", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
+  RESEARCHER: { label: "นักวิจัย", color: "bg-green-500/10 text-green-500 border-green-500/20" },
+  ENTREPRENEUR: { label: "ผู้ประกอบการ", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
 }
 
 // Importing icons again because I can't use Activity (replaced in function)
@@ -64,15 +64,15 @@ export default async function ParticipantsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Participants</h1>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight">ผู้เข้าร่วม</h1>
           <p className="text-muted-foreground">
-            View and manage all registered researchers, students, and entrepreneurs.
+            ดูและจัดการรายชื่อนักวิจัย นักศึกษา และผู้ประกอบการในโครงการ
           </p>
         </div>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Add Participant
+          เพิ่มผู้เข้าร่วม
         </Button>
       </div>
 
@@ -81,13 +81,13 @@ export default async function ParticipantsPage() {
       <Card className="border-none shadow-sm bg-card/50">
         <CardHeader className="pb-3 px-6">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Directory</CardTitle>
+            <CardTitle className="text-lg font-semibold">ทะเบียนรายชื่อ</CardTitle>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="ID, Name, or Organization..."
+                  placeholder="รหัส, ชื่อ หรือ องค์กร..."
                   className="w-[300px] pl-9 bg-background/50 h-9"
                 />
               </div>
@@ -97,25 +97,25 @@ export default async function ParticipantsPage() {
             </div>
           </div>
           <CardDescription>
-            Displaying {participants.length} registered members of the ecosystem.
+            แสดงรายชื่อสมาชิก {participants.length} รายในระบบนิเวศนวัตกรรม
           </CardDescription>
         </CardHeader>
         <CardContent className="px-0">
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow>
-                <TableHead className="pl-6 w-[250px]">Name & Email</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Affiliation / Details</TableHead>
-                <TableHead>Joined At</TableHead>
-                <TableHead className="text-right pr-6">Action</TableHead>
+                <TableHead className="pl-6 w-[250px]">ชื่อและอีเมล</TableHead>
+                <TableHead>ประเภท</TableHead>
+                <TableHead>ความเชี่ยวชาญ / รายละเอียด</TableHead>
+                <TableHead>วันที่เข้ารวม</TableHead>
+                <TableHead className="text-right pr-6">จัดการ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {participants.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                    No participants found.
+                    ไม่พบข้อมูลผู้เข้าร่วมในระบบ
                   </TableCell>
                 </TableRow>
               ) : (
@@ -144,7 +144,7 @@ export default async function ParticipantsPage() {
                        {new Date(p.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <Button variant="ghost" size="xs">Edit</Button>
+                      <Button variant="ghost" size="xs">แก้ไข</Button>
                     </TableCell>
                   </TableRow>
                 ))
