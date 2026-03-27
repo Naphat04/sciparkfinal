@@ -2,14 +2,16 @@
 
 import React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { ParticipantFilter } from "@/components/features/participant-filter"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ConfirmDelete } from "@/components/features/confirm-delete"
 
 const typeMap: Record<string, { label: string; color: string }> = {
-  STUDENT: { label: "นักศึกษา", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
   PROJECT_MANAGER: { label: "ผู้จัดการโครงการ", color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" },
   LECTURER: { label: "อาจารย์", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
   RESEARCHER: { label: "นักวิจัย", color: "bg-green-500/10 text-green-500 border-green-500/20" },
@@ -28,10 +30,6 @@ type Participant = {
 }
 
 function getParticipantDetails(p: Participant) {
-  if (p.type === "STUDENT") {
-    const prof = p.studentProfile
-    return prof ? `${prof.faculty || "ไม่ระบุคณะ"} - ${prof.program || "ไม่ระบุสาขา"} (ปี ${prof.year || "?"})` : "-"
-  }
   if (p.type === "LECTURER") {
     const prof = p.lecturerProfile
     return prof ? `${prof.position || "อาจารย์/ที่ปรึกษา"} ณ ${prof.faculty || "ไม่ระบุคณะ"}` : "-"
@@ -51,6 +49,27 @@ function getParticipantDetails(p: Participant) {
 }
 
 export function ParticipantsContent({ participants }: { participants: Participant[] }) {
+  const router = useRouter()
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/participants/${id}`, {
+        method: "DELETE",
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || "Failed to delete participant")
+      }
+
+      toast.success("ลบข้อมูลผู้เข้าร่วมเรียบร้อยแล้ว")
+      router.refresh()
+    } catch (error: any) {
+      toast.error(error.message || "เกิดข้อผิดพลาดในการลบข้อมูล")
+      throw error
+    }
+  }
+
   return (
     <ParticipantFilter
       participants={participants}
@@ -71,7 +90,7 @@ export function ParticipantsContent({ participants }: { participants: Participan
                   <TableHead>อีเมล</TableHead>
                   <TableHead className="w-[160px]">ประเภท</TableHead>
                   <TableHead>รายละเอียด</TableHead>
-                  <TableHead className="text-right pr-6 w-[140px]">จัดการ</TableHead>
+                  <TableHead className="text-right pr-6 w-[180px]">จัดการ</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -90,7 +109,7 @@ export function ParticipantsContent({ participants }: { participants: Participan
                         </Link>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground font-mono">
-                        {p.type === "STUDENT" ? (p.studentProfile?.studentId || "-") : "-"}
+                        -
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground font-mono">{p.user?.email || "-"}</TableCell>
                       <TableCell>
@@ -100,7 +119,16 @@ export function ParticipantsContent({ participants }: { participants: Participan
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{getParticipantDetails(p)}</TableCell>
                       <TableCell className="text-right pr-6">
-                        <Button variant="ghost" size="xs" nativeButton={false} render={<Link href={`/participants/${p.id}`}>ดูรายละเอียด</Link>} />
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/participants/${p.id}`}>
+                            <Button variant="ghost" size="xs">รายละเอียด</Button>
+                          </Link>
+                          <ConfirmDelete
+                            title="ลบผู้เข้าร่วม"
+                            description={`คุณต้องการลบข้อมูลของ "${p.user?.name || "ผู้เข้าร่วมรายนี้"}" ใช่หรือไม่?`}
+                            onConfirm={() => handleDelete(p.id)}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

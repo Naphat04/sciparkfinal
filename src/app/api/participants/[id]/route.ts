@@ -134,3 +134,27 @@ export async function PUT(
     }
   }, { roles: ["PROJECT_MANAGER"] })
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  return withAuth(
+    req,
+    async () => {
+      const { id } = await params
+      if (!id) return NextResponse.json({ error: "Participant ID is required" }, { status: 400 })
+
+      try {
+        await prisma.participant.delete({
+          where: { id },
+        })
+        return NextResponse.json({ success: true })
+      } catch (error: any) {
+        console.error("/api/participants/[id] DELETE error", error)
+        return NextResponse.json({ error: "Failed to delete participant" }, { status: 500 })
+      }
+    },
+    { roles: ["PROJECT_MANAGER"] }
+  )
+}

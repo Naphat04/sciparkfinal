@@ -22,7 +22,6 @@ type Props = {
 }
 
 const TYPE_OPTIONS = [
-  { id: "STUDENT", label: "นักศึกษา" },
   { id: "PROJECT_MANAGER", label: "ผู้จัดการโครงการ" },
   { id: "LECTURER", label: "อาจารย์" },
   { id: "RESEARCHER", label: "นักวิจัย" },

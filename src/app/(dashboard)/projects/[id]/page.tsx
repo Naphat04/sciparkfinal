@@ -397,6 +397,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             />
           </div>
         </TabsContent>
+
       </Tabs>
     </div>
   )

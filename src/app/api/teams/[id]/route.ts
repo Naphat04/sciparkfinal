@@ -34,3 +34,27 @@ export async function PATCH(
     }
   }, { roles: ["PROJECT_MANAGER"] })
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  return withAuth(
+    req,
+    async () => {
+      const { id } = await params
+      if (!id) return NextResponse.json({ error: "Team ID is required" }, { status: 400 })
+
+      try {
+        await prisma.team.delete({
+          where: { id },
+        })
+        return NextResponse.json({ success: true })
+      } catch (error: any) {
+        console.error("/api/teams/[id] DELETE error", error)
+        return NextResponse.json({ error: "Failed to delete team" }, { status: 500 })
+      }
+    },
+    { roles: ["PROJECT_MANAGER"] }
+  )
+}

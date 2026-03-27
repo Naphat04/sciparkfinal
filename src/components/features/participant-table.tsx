@@ -15,10 +15,10 @@ import { ParticipantModal } from "@/components/features/participant-modal"
 import { Users } from "lucide-react"
 
 const PARTICIPANT_TYPES: Record<string, { label: string; color: string }> = {
-  STUDENT: { label: "นักศึกษา", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
   ENTREPRENEUR: { label: "ผู้ประกอบการ", color: "bg-green-500/10 text-green-500 border-green-500/20" },
   RESEARCHER: { label: "นักวิจัย", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
-  LECTURER: { label: "ที่ปรึกษา/อาจารย์", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" }
+  LECTURER: { label: "ที่ปรึกษา/อาจารย์", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
+  PROJECT_MANAGER: { label: "ผู้จัดการโครงการ", color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" }
 }
 
 type Participant = {
@@ -37,7 +37,7 @@ type Props = {
 }
 
 export function ParticipantTable({ participants, projectId, isParticipant }: Props) {
-  const typeInfo = (type: string) => PARTICIPANT_TYPES[type] || PARTICIPANT_TYPES.STUDENT
+  const typeInfo = (type: string) => PARTICIPANT_TYPES[type] || { label: type, color: "" }
 
   return (
     <Card className="border-none shadow-sm bg-card/50">

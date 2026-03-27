@@ -2,6 +2,8 @@
 
 import React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -14,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ProjectFilter } from "@/components/features/project-filter"
+import { ConfirmDelete } from "@/components/features/confirm-delete"
 
 type Project = {
   id: string
@@ -57,6 +60,27 @@ type Props = {
 }
 
 export function ProjectsContent({ projects }: Props) {
+  const router = useRouter()
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/projects/${id}`, {
+        method: "DELETE",
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || "Failed to delete project")
+      }
+
+      toast.success("ลบโครงการเรียบร้อยแล้ว")
+      router.refresh()
+    } catch (error: any) {
+      toast.error(error.message || "เกิดข้อผิดพลาดในการลบโครงการ")
+      throw error
+    }
+  }
+
   return (
     <ProjectFilter
       projects={projects}
@@ -114,11 +138,18 @@ export function ProjectsContent({ projects }: Props) {
                           {formatDateYMD(project.endDate)}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Link href={`/projects/${project.id}`}>
-                            <Button variant="ghost" size="xs">
-                              ดูรายละเอียด
-                            </Button>
-                          </Link>
+                          <div className="flex justify-end gap-2">
+                            <Link href={`/projects/${project.id}`}>
+                              <Button variant="ghost" size="xs">
+                                รายละเอียด
+                              </Button>
+                            </Link>
+                            <ConfirmDelete
+                              title="ลบโครงการ"
+                              description={`คุณต้องการลบโครงการ "${project.name}" ใช่หรือไม่? การลบจะทำให้ทีมและข้อมูลที่เกี่ยวข้องทั้งหมดถูกลบไปด้วย`}
+                              onConfirm={() => handleDelete(project.id)}
+                            />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))

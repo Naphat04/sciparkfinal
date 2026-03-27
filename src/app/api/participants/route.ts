@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return withAuth(req, async () => {
     const body = await req.json()
-    const allowedTypes = ["STUDENT", "LECTURER", "RESEARCHER", "ENTREPRENEUR", "PROJECT_MANAGER"]
+    const allowedTypes = ["LECTURER", "RESEARCHER", "ENTREPRENEUR", "PROJECT_MANAGER"]
 
     if (!body.name || !body.email || !body.type) {
       return NextResponse.json({ error: "Missing required fields (name, email, type)" }, { status: 400 })

@@ -12,6 +12,7 @@ import * as teamService from "@/services/team.service"
 import * as projectService from "@/services/project.service"
 import { TeamFilters } from "@/components/features/team-filters"
 import { getMockSession } from "@/lib/auth-utils"
+import { TeamDeleteButton } from "./_components/team-delete-button"
 
 export const metadata: Metadata = {
   title: "ทีมทั้งหมด | Sci-Park",
@@ -145,12 +146,17 @@ export default async function TeamsPage({ searchParams }: PageProps) {
                           <span className="font-medium">{team.project.name}</span>
                         </div>
                       </div>
-                      <Badge
-                        variant="outline"
-                        className={`${statusBadgeStyles[team.status] || ""} text-[9px] h-5 font-black tracking-widest uppercase px-2`}
-                      >
-                        {statusThai[team.status] || team.status}
-                      </Badge>
+                      <div className="flex flex-col items-end gap-2">
+                        <Badge
+                          variant="outline"
+                          className={`${statusBadgeStyles[team.status] || ""} text-[9px] h-5 font-black tracking-widest uppercase px-2`}
+                        >
+                          {statusThai[team.status] || team.status}
+                        </Badge>
+                        {!isReadOnly && (
+                          <TeamDeleteButton teamId={team.id} teamName={team.name} />
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   <Separator className="opacity-30" />

@@ -41,7 +41,7 @@ type ParticipantDetail = {
 }
 
 const typeMap: Record<string, { label: string; color: string }> = {
-  STUDENT: { label: "นักศึกษา", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+  PROJECT_MANAGER: { label: "ผู้จัดการโครงการ", color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" },
   PROJECT_MANAGER: { label: "ผู้จัดการโครงการ", color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" },
   LECTURER: { label: "อาจารย์", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
   RESEARCHER: { label: "นักวิจัย", color: "bg-green-500/10 text-green-500 border-green-500/20" },
@@ -75,7 +75,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
   const typeInfo = typeMap[participant.type] || { label: participant.type, color: "" }
 
   const memberships = participant.teamMemberships ?? []
-  const directProject = participant.project ?? null
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,26 +106,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
               <CardDescription>รายละเอียดตามประเภทของผู้เข้าร่วม</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {participant.type === "STUDENT" && (
-                <div className="grid gap-2">
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">รหัสนักศึกษา</span>
-                    <span className="font-medium">{participant.studentProfile?.studentId || "-"}</span>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">คณะ</span>
-                    <span className="font-medium">{participant.studentProfile?.faculty || "-"}</span>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">สาขา</span>
-                    <span className="font-medium">{participant.studentProfile?.program || "-"}</span>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">ชั้นปี</span>
-                    <span className="font-medium">{participant.studentProfile?.year ?? "-"}</span>
-                  </div>
-                </div>
-              )}
+
 
               {participant.type === "LECTURER" && (
                 <div className="grid gap-2">
@@ -187,26 +168,10 @@ export default async function ParticipantDetailPage({ params }: Props) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {memberships.length === 0 && !directProject ? (
+              {memberships.length === 0 ? (
                 <div className="text-sm text-muted-foreground">ยังไม่พบประวัติการเข้าร่วมโครงการ</div>
               ) : (
                 <div className="space-y-3">
-                  {directProject && (
-                    <Link
-                      href={`/projects/${directProject.id}`}
-                      className="group flex items-start justify-between gap-3 rounded-xl border border-border/60 bg-background/60 px-4 py-3 hover:border-primary/50 hover:bg-background transition-all"
-                    >
-                      <div className="grid gap-1">
-                        <span className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.12em]">
-                          เข้าร่วมโดยตรง
-                        </span>
-                        <span className="text-sm font-extrabold group-hover:text-primary transition-colors line-clamp-2">
-                          {directProject.name}
-                        </span>
-                      </div>
-                      <ExternalLink className="h-4 w-4 opacity-40 group-hover:opacity-100 mt-1" />
-                    </Link>
-                  )}
 
                   {memberships.map((m) => {
                     const team = m.team
