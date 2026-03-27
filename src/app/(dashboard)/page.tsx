@@ -1,6 +1,8 @@
 import { Metadata } from "next"
 import { Activity, ArrowRight, Briefcase, GraduationCap, PlusCircle, Users } from "lucide-react"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+import { getMockSession } from "@/lib/auth-utils"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -72,6 +74,11 @@ function StatCard({
 }
 
 export default async function DashboardPage() {
+  const session = await getMockSession()
+  if (session?.user?.role === "PROJECT_MANAGER" || session?.user?.role === "PARTICIPANT") {
+    redirect("/projects")
+  }
+
   const [stats, recentProjects, upcoming, recentTeams, recentParticipants] = await Promise.all([
     dashboardService.getDashboardStats(),
     dashboardService.getRecentProjects(5),

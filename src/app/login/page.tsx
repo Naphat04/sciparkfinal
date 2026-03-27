@@ -17,7 +17,12 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role })
       })
-      router.push("/projects")
+      
+      if (role === "SUPER_ADMIN") {
+        router.push("/")
+      } else {
+        router.push("/projects")
+      }
       router.refresh()
     } finally {
       setLoading(false)

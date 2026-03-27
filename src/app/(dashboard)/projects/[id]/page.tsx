@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { getMockSession } from "@/lib/auth-utils"
 import * as projectService from "@/services/project.service"
 import * as participantService from "@/services/participant.service"
 import * as teamService from "@/services/team.service"
@@ -77,6 +78,10 @@ export default async function ProjectDetailPage({ params }: Props) {
   const projectParticipants = await participantService.getParticipantsByProject(resolvedParams.id)
   const allParticipants = await participantService.getAllParticipants()
   const allProjects = await projectService.getAllProjects()
+  
+  const session = await getMockSession()
+  const isParticipant = session?.user?.role === "PARTICIPANT"
+  
   const projectView = project as (typeof project & { awards?: AwardView[]; milestones?: MilestoneView[] }) | null
   const awards = projectView?.awards ?? []
   const milestones = projectView?.milestones ?? []
@@ -125,19 +130,23 @@ export default async function ProjectDetailPage({ params }: Props) {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap justify-end">
-          <ProjectStatusActions projectId={resolvedParams.id} currentStatus={project.status} />
-          <ProjectEditModal
-            projectId={resolvedParams.id}
-            initialValues={{
-              name: project.name,
-              description: project.description ?? null,
-              startDate: toDateInputValue(project.startDate),
-              endDate: toDateInputValue(project.endDate),
-              fiscalYear: (project as any).fiscalYear ?? null,
-              budget: project.budget ?? null,
-              maxTeams: project.maxTeams ?? null,
-            }}
-          />
+          {!isParticipant && (
+            <>
+              <ProjectStatusActions projectId={resolvedParams.id} currentStatus={project.status} />
+              <ProjectEditModal
+                projectId={resolvedParams.id}
+                initialValues={{
+                  name: project.name,
+                  description: project.description ?? null,
+                  startDate: toDateInputValue(project.startDate),
+                  endDate: toDateInputValue(project.endDate),
+                  fiscalYear: (project as any).fiscalYear ?? null,
+                  budget: project.budget ?? null,
+                  maxTeams: project.maxTeams ?? null,
+                }}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -157,13 +166,15 @@ export default async function ProjectDetailPage({ params }: Props) {
               แอดมินสามารถเลือกทีมที่ได้รางวัลที่ 1–3 ได้เอง
             </CardDescription>
           </div>
-          <ProjectAwardsModal
-            projectId={resolvedParams.id}
-            teams={teams.map((t) => ({ id: t.id, name: t.name }))}
-            initialAwards={awards
-              .filter((a) => a.team)
-              .map((a) => ({ rank: a.rank, teamId: a.teamId, teamName: a.team!.name }))}
-          />
+          {!isParticipant && (
+            <ProjectAwardsModal
+              projectId={resolvedParams.id}
+              teams={teams.map((t) => ({ id: t.id, name: t.name }))}
+              initialAwards={awards
+                .filter((a) => a.team)
+                .map((a) => ({ rank: a.rank, teamId: a.teamId, teamName: a.team!.name }))}
+            />
+          )}
         </CardHeader>
         <CardContent className="pt-0">
           <div className="grid gap-4 md:grid-cols-3">
@@ -281,6 +292,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               <ProjectTimelineBuilder
                 projectId={resolvedParams.id}
                 initialMilestones={milestones}
+                isParticipant={isParticipant}
               />
            </div>
         </TabsContent>
@@ -297,16 +309,20 @@ export default async function ProjectDetailPage({ params }: Props) {
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input placeholder="Search teams..." className="pl-9 w-[280px] bg-background/50 h-9" />
                    </div>
-                   <LinkExistingTeamModal
-                      projectId={resolvedParams.id}
-                      currentTeamIds={teams.map((t) => t.id)}
-                      availableTeams={allTeams.map((t) => ({ id: t.id, name: t.name, status: t.status, _count: t._count, project: t.project }))}
-                   />
-                   <AddTeamModal
-                      projectId={resolvedParams.id}
-                      projects={allProjects.map((p) => ({ id: p.id, name: p.name }))}
-                      participants={allParticipants.map((p) => ({ id: p.id, user: { name: p.user?.name || null, email: p.user.email } }))}
-                    />
+                   {!isParticipant && (
+                     <>
+                       <LinkExistingTeamModal
+                          projectId={resolvedParams.id}
+                          currentTeamIds={teams.map((t) => t.id)}
+                          availableTeams={allTeams.map((t) => ({ id: t.id, name: t.name, status: t.status, _count: t._count, project: t.project }))}
+                       />
+                       <AddTeamModal
+                          projectId={resolvedParams.id}
+                          projects={allProjects.map((p) => ({ id: p.id, name: p.name }))}
+                          participants={allParticipants.map((p) => ({ id: p.id, user: { name: p.user?.name || null, email: p.user.email } }))}
+                        />
+                     </>
+                   )}
                 </div>
               </div>
 
@@ -377,6 +393,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 createdAt: p.createdAt
               }))}
               projectId={resolvedParams.id}
+              isParticipant={isParticipant}
             />
           </div>
         </TabsContent>

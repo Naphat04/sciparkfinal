@@ -7,6 +7,7 @@ import * as projectService from "@/services/project.service"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { ProjectsContent } from "./_components/projects-content"
+import { getMockSession } from "@/lib/auth-utils"
 
 export const metadata: Metadata = {
   title: "โครงการทั้งหมด | Sci-Park",
@@ -33,6 +34,8 @@ function getStatusColor(status: string) {
 
 export default async function ProjectsPage() {
   const projects = await projectService.getAllProjects()
+  const session = await getMockSession()
+  const isParticipant = session?.user?.role === "PARTICIPANT"
 
   return (
     <div className="flex flex-col gap-6">
@@ -43,12 +46,14 @@ export default async function ProjectsPage() {
             จัดการและติดตามโครงการนวัตกรรมและแผนการบ่มเพาะวิสาหกิจ
           </p>
         </div>
-        <Link href="/projects/create">
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            สร้างโครงการ
-          </Button>
-        </Link>
+        {!isParticipant && (
+          <Link href="/projects/create">
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              สร้างโครงการ
+            </Button>
+          </Link>
+        )}
       </div>
 
       <Separator />

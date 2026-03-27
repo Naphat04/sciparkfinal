@@ -91,8 +91,29 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const currentUser = user ? {
     name: user.name,
     email: user.email,
+    role: user.role,
     avatar: "",
-  } : data.user
+  } : { ...data.user, role: "SUPER_ADMIN" }
+
+  const filteredNavMain = data.navMain.filter((item) => {
+    if (currentUser.role === "PARTICIPANT") {
+      return item.title === "โครงการ" || item.title === "ทีม"
+    }
+    if (currentUser.role === "SUPER_ADMIN") {
+      return item.title === "แผงควบคุม"
+    }
+    if (currentUser.role === "PROJECT_MANAGER") {
+      return item.title !== "แผงควบคุม"
+    }
+    return true
+  })
+
+  const filteredNavSecondary = data.navSecondary.filter((item) => {
+    if (currentUser.role === "PARTICIPANT" || currentUser.role === "SUPER_ADMIN") {
+      return false
+    }
+    return true
+  })
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -124,7 +145,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           <SidebarGroupLabel className="text-[10px] uppercase font-black tracking-widest opacity-50">เมนูหลัก</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.navMain.map((item) => (
+              {filteredNavMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     tooltip={item.title}
@@ -143,29 +164,30 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Workflow */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] uppercase font-black tracking-widest opacity-50">กระบวนการทำงาน</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {data.navSecondary.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    tooltip={item.title}
-                    isActive={pathname?.startsWith(item.url)}
-                    nativeButton={false}
-                    render={
-                      <Link href={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    }
-                  />
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {filteredNavSecondary.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-[10px] uppercase font-black tracking-widest opacity-50">กระบวนการทำงาน</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filteredNavSecondary.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton 
+                      tooltip={item.title}
+                      isActive={pathname?.startsWith(item.url)}
+                      nativeButton={false}
+                      render={
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      }
+                    />
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter>

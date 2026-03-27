@@ -22,6 +22,7 @@ type Milestone = {
 type Props = {
   projectId: string
   initialMilestones: Milestone[]
+  isParticipant?: boolean
 }
 
 const statusLabel: Record<Milestone["status"], string> = {
@@ -48,7 +49,7 @@ function toDateInput(value: string | Date) {
   return `${yyyy}-${mm}-${dd}`
 }
 
-export function ProjectTimelineBuilder({ projectId, initialMilestones }: Props) {
+export function ProjectTimelineBuilder({ projectId, initialMilestones, isParticipant }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -200,7 +201,8 @@ export function ProjectTimelineBuilder({ projectId, initialMilestones }: Props) 
         <CardDescription>สร้างและจัดการ milestone ของโครงการแบบเรียงตามเวลา</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="grid gap-3 rounded-xl border p-4 bg-background/50">
+        {!isParticipant && (
+          <div className="grid gap-3 rounded-xl border p-4 bg-background/50">
           <div className="grid md:grid-cols-2 gap-3">
             <div className="grid gap-2">
               <Label htmlFor="timeline_title">ชื่อ Milestone</Label>
@@ -257,6 +259,7 @@ export function ProjectTimelineBuilder({ projectId, initialMilestones }: Props) 
             </Button>
           </div>
         </div>
+        )}
 
         <div className="space-y-3">
           {milestones.length === 0 ? (
@@ -316,12 +319,16 @@ export function ProjectTimelineBuilder({ projectId, initialMilestones }: Props) 
                       <Badge variant="outline" className={statusColor[m.status]}>
                         {statusLabel[m.status]}
                       </Badge>
-                      <Button type="button" size="icon-xs" variant="ghost" onClick={() => beginEdit(m)} disabled={loading}>
-                        <Edit3 className="h-3 w-3" />
-                      </Button>
-                      <Button type="button" size="icon-xs" variant="ghost" onClick={() => handleDelete(m.id)} disabled={loading}>
-                        <Trash2 className="h-3 w-3 text-destructive" />
-                      </Button>
+                      {!isParticipant && (
+                        <>
+                          <Button type="button" size="icon-xs" variant="ghost" onClick={() => beginEdit(m)} disabled={loading}>
+                            <Edit3 className="h-3 w-3" />
+                          </Button>
+                          <Button type="button" size="icon-xs" variant="ghost" onClick={() => handleDelete(m.id)} disabled={loading}>
+                            <Trash2 className="h-3 w-3 text-destructive" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}

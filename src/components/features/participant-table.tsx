@@ -33,9 +33,10 @@ type Participant = {
 type Props = {
   participants: Participant[]
   projectId: string
+  isParticipant?: boolean
 }
 
-export function ParticipantTable({ participants, projectId }: Props) {
+export function ParticipantTable({ participants, projectId, isParticipant }: Props) {
   const typeInfo = (type: string) => PARTICIPANT_TYPES[type] || PARTICIPANT_TYPES.STUDENT
 
   return (
@@ -45,7 +46,7 @@ export function ParticipantTable({ participants, projectId }: Props) {
           <CardTitle className="text-lg font-semibold">ผู้เข้าร่วมโครงการ</CardTitle>
           <CardDescription>รายชื่อบุคคลที่เข้าร่วมในโครงการนี้</CardDescription>
         </div>
-        <ParticipantModal projectId={projectId} mode="add" />
+        {!isParticipant && <ParticipantModal projectId={projectId} mode="add" />}
       </CardHeader>
 
       <CardContent>
@@ -64,7 +65,7 @@ export function ParticipantTable({ participants, projectId }: Props) {
                   <TableHead>อีเมล</TableHead>
                   <TableHead className="w-[150px]">ประเภท</TableHead>
                   <TableHead>วันที่เข้าร่วม</TableHead>
-                  <TableHead className="w-[80px] text-center">จัดการ</TableHead>
+                  {!isParticipant && <TableHead className="w-[80px] text-center">จัดการ</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -82,13 +83,15 @@ export function ParticipantTable({ participants, projectId }: Props) {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">{joinDate}</TableCell>
-                      <TableCell className="text-center">
-                        <ParticipantModal
-                          projectId={projectId}
-                          mode="edit"
-                          participantData={participant}
-                        />
-                      </TableCell>
+                      {!isParticipant && (
+                        <TableCell className="text-center">
+                          <ParticipantModal
+                            projectId={projectId}
+                            mode="edit"
+                            participantData={participant}
+                          />
+                        </TableCell>
+                      )}
                     </TableRow>
                   )
                 })}
