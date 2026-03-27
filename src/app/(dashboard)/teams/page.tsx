@@ -162,10 +162,7 @@ export default async function TeamsPage({ searchParams }: PageProps) {
                           <span className="text-xs font-black">{team._count.members}</span>
                           <span className="text-[10px] text-muted-foreground font-mono uppercase">สมาชิก</span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-muted/30 rounded-lg px-2.5 py-1.5">
-                          <span className="text-xs font-black">{team._count.proposals}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono uppercase">ข้อเสนอ</span>
-                        </div>
+
                       </div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary/60 group-hover:translate-x-0.5 transition-all" />
                     </div>

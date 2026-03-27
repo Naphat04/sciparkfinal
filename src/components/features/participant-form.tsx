@@ -148,32 +148,34 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
         </div>
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="phone">เบอร์โทร</Label>
-        <Input
-          id="phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="เช่น 0812345678"
-          disabled={isLoading}
-        />
-      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="phone">เบอร์โทร</Label>
+          <Input
+            id="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="เช่น 0812345678"
+            disabled={isLoading}
+          />
+        </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="type">ประเภทผู้เข้าร่วม *</Label>
-        <select
-          id="type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          disabled={isLoading || mode === "edit"}
-          className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-primary/40"
-        >
-          {PARTICIPANT_TYPES.map((pt) => (
-            <option key={pt.id} value={pt.id}>
-              {pt.label}
-            </option>
-          ))}
-        </select>
+        <div className="grid gap-2">
+          <Label htmlFor="type">ประเภทผู้เข้าร่วม *</Label>
+          <select
+            id="type"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            disabled={isLoading || mode === "edit"}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-primary/40"
+          >
+            {PARTICIPANT_TYPES.map((pt) => (
+              <option key={pt.id} value={pt.id}>
+                {pt.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <Separator className="my-4" />
@@ -183,15 +185,32 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
         <div className="space-y-4 bg-muted/20 p-4 rounded-lg">
           <h4 className="font-semibold text-sm">ข้อมูลนักศึกษา</h4>
           <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="studentId">รหัสนักศึกษา *</Label>
-              <Input
-                id="studentId"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
-                placeholder="เช่น 66123456"
-                disabled={isLoading}
-              />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2 col-span-2">
+                <Label htmlFor="studentId">รหัสนักศึกษา *</Label>
+                <Input
+                  id="studentId"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                  placeholder="เช่น 66123456"
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="year">ชั้นปี</Label>
+                <select
+                  id="year"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  disabled={isLoading}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-primary/40"
+                >
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -215,21 +234,6 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
                 />
               </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="year">ชั้นปี</Label>
-              <select
-                id="year"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                disabled={isLoading}
-                className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-primary/40"
-              >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
           </div>
         </div>
       )}
@@ -237,7 +241,7 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
       {type === "LECTURER" && (
         <div className="space-y-4 bg-muted/20 p-4 rounded-lg">
           <h4 className="font-semibold text-sm">ข้อมูลอาจารย์</h4>
-          <div className="grid gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="faculty_lecturer">คณะ *</Label>
               <Input
@@ -265,7 +269,7 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
       {type === "RESEARCHER" && (
         <div className="space-y-4 bg-muted/20 p-4 rounded-lg">
           <h4 className="font-semibold text-sm">ข้อมูลนักวิจัย</h4>
-          <div className="grid gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="organization">องค์กร *</Label>
               <Input
@@ -293,7 +297,7 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
       {type === "ENTREPRENEUR" && (
         <div className="space-y-4 bg-muted/20 p-4 rounded-lg">
           <h4 className="font-semibold text-sm">ข้อมูลผู้ประกอบการ</h4>
-          <div className="grid gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="companyName">ชื่อบริษัท *</Label>
               <Input

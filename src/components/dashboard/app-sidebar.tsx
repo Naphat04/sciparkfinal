@@ -62,18 +62,7 @@ const data = {
       icon: GraduationCap,
     },
   ],
-  navSecondary: [
-    {
-      title: "ข้อเสนอโครงการ",
-      url: "/proposals",
-      icon: FileText,
-    },
-    {
-      title: "การประเมิน",
-      url: "/evaluations",
-      icon: BarChart,
-    },
-  ],
+  navSecondary: [] as { title: string; url: string; icon: any }[],
   user: {
     name: "Admin User",
     email: "admin@scipark.university",

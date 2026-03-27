@@ -61,7 +61,7 @@ export function AddParticipantModal({ triggerLabel }: Props) {
           </button>
         }
       />
-      <DialogContent className="sm:max-w-[600px] border-none shadow-2xl bg-card">
+      <DialogContent className="sm:max-w-[600px] max-h-[90dvh] overflow-y-auto border-none shadow-2xl bg-card">
         <DialogHeader>
           <div className="bg-primary/10 text-primary w-fit p-3 rounded-full mb-2">
             <Users className="h-6 w-6" />

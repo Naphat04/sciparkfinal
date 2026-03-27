@@ -125,7 +125,7 @@ export function ProjectEditModal({ projectId, initialValues }: Props) {
         }
       />
 
-      <DialogContent className="sm:max-w-[720px] border-none shadow-2xl bg-card">
+      <DialogContent className="sm:max-w-[720px] max-h-[90dvh] overflow-y-auto border-none shadow-2xl bg-card">
         <DialogHeader>
           <div className="flex items-center justify-between gap-4">
             <div>

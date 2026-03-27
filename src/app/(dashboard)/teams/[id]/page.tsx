@@ -186,74 +186,7 @@ export default async function TeamDetailPage({ params }: Props) {
              </CardContent>
            </Card>
 
-           <Card className="border-none shadow-sm bg-card/50">
-              <CardHeader>
-                 <CardTitle className="text-lg">Proposals & Submissions</CardTitle>
-                 <CardDescription>Official business plans and innovation abstracts submitted for evaluation.</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-2">
-                 {team.proposals.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center p-16 border-2 border-dashed border-muted-foreground/10 rounded-2xl bg-muted/5 group">
-                       <FileText className="h-10 w-10 text-muted-foreground/30 mb-3 group-hover:scale-110 group-hover:text-primary/40 transition-all duration-500" />
-                       <div className="text-sm font-bold text-muted-foreground">No Submissions Found</div>
-                       <p className="text-[11px] text-muted-foreground italic mb-4">You must create a proposal draft first.</p>
-                       {!isReadOnly && <SubmitProposalModal teamId={team.id} teamName={team.name} />}
-                    </div>
-                 ) : (
-                    <div className="space-y-3">
-                       {team.proposals.map((proposal: any) => (
-                          <div key={proposal.id} className="flex flex-col p-5 border border-primary/5 rounded-2xl bg-background/40 hover:bg-background/60 hover:shadow-lg transition-all duration-300 group ring-1 ring-transparent hover:ring-primary/10">
-                             <div className="flex items-start justify-between">
-                                <div className="flex items-start gap-4">
-                                   <div className="p-3 rounded-xl bg-primary/10 text-primary border border-primary/20">
-                                      <FileText className="h-6 w-6" />
-                                   </div>
-                                   <div className="grid leading-snug">
-                                      <div className="text-base font-bold tracking-tight group-hover:text-primary transition-colors">{proposal.title}</div>
-                                      <div className="text-[11px] text-muted-foreground font-light mb-2 max-w-[400px] line-clamp-1">{proposal.description || "No summary provided."}</div>
-                                      <div className="flex items-center gap-3">
-                                         <Badge variant={proposal.status === "DRAFT" ? "outline" : "default"} className="text-[10px] h-4.5 px-2 tracking-tighter mix-blend-multiply dark:mix-blend-normal">
-                                            {proposal.status === "DRAFT" && <Clock className="h-2.5 w-2.5 mr-1" />}
-                                            {proposal.status === "SUBMITTED" && <CheckCircle2 className="h-2.5 w-2.5 mr-1" />}
-                                            {proposal.status}
-                                         </Badge>
-                                         <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-mono uppercase opacity-70">
-                                            Updated: {new Date(proposal.updatedAt).toLocaleDateString()}
-                                         </span>
-                                      </div>
-                                   </div>
-                                </div>
-                                <div className="flex flex-col items-end gap-2">
-                                   {proposal.status === "DRAFT" ? (
-                                      <SubmitProposalAction proposalId={proposal.id} />
-                                   ) : (
-                                      <div className="text-[10px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1.5 px-3 py-1 bg-green-500/10 rounded-full">
-                                         <CheckCircle2 className="h-3 w-3" />
-                                         Finalized
-                                      </div>
-                                   )}
-                                   {proposal.fileUrl && (
-                                       <Button 
-                                          variant="ghost" 
-                                          size="xs" 
-                                          className="h-6 text-[10px] opacity-70" 
-                                          nativeButton={false}
-                                          render={
-                                            <a href={proposal.fileUrl} target="_blank" rel="noreferrer">
-                                               <Download className="h-3 w-3 mr-1" />
-                                               Resource
-                                            </a>
-                                          }
-                                       />
-                                   )}
-                                </div>
-                             </div>
-                          </div>
-                       ))}
-                    </div>
-                 )}
-              </CardContent>
-           </Card>
+
         </div>
 
         <div className="md:col-span-4 flex flex-col gap-6">

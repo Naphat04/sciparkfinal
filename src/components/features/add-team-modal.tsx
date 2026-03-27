@@ -34,7 +34,7 @@ export function AddTeamModal({ projectId, projects, participants }: Props) {
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-[680px] border-none shadow-2xl bg-card">
+      <DialogContent className="sm:max-w-[680px] max-h-[90dvh] overflow-y-auto border-none shadow-2xl bg-card">
         <DialogHeader>
           <DialogTitle>Register Team for Project</DialogTitle>
           <DialogDescription>
