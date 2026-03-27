@@ -15,9 +15,8 @@ export function hasPermission(user: AuthenticatedUser, permission: Permission): 
  * Currently, we use exact matching or hierarchical check for ADMINs.
  */
 export function hasRole(user: AuthenticatedUser, allowedRoles: UserRole[]): boolean {
-  if (allowedRoles.includes(user.role)) return true
-  if (user.role === "SUPER_ADMIN") return true
-  return false
+  // Strict role matching — no implicit "God mode" bypass
+  return allowedRoles.includes(user.role)
 }
 
 import { cookies } from "next/headers"
@@ -25,6 +24,9 @@ import { cookies } from "next/headers"
 /**
  * Mocking a session for current development Phase 2.
  * In a real app, this would be retrieved from NextAuth / Auth.js.
+/**
+ * TODO: [PRODUCTION] Replace with NextAuth / Auth.js session provider before deployment.
+ * Current mock session reads role from cookies without any verification.
  */
 export async function getMockSession(): Promise<{ user: AuthenticatedUser } | null> {
   let role = "SUPER_ADMIN"

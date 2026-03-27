@@ -107,7 +107,7 @@ export async function PATCH(
 
       return NextResponse.json(updated)
     },
-    { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"] }
+    { roles: ["PROJECT_MANAGER"] }
   )
 }
 

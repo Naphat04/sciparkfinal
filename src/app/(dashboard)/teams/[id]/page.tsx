@@ -2,13 +2,11 @@ import { Metadata } from "next"
 import { 
   ChevronLeft, 
   Users, 
-  FileText, 
   Clock, 
   CheckCircle2, 
   UserPlus, 
   ExternalLink,
   MoreHorizontal,
-  Download,
   Briefcase
 } from "lucide-react"
 import Link from "next/link"
@@ -28,8 +26,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
-import { SubmitProposalModal } from "@/components/features/submit-proposal-modal"
-import { SubmitProposalAction } from "@/components/features/proposal-actions"
+
 import { AddTeamMemberModal } from "@/components/features/add-team-member-modal"
 import { TeamStatusActions } from "@/components/features/team-status-actions"
 
@@ -92,14 +89,11 @@ export default async function TeamDetailPage({ params }: Props) {
         </div>
         <div className="flex items-center gap-2">
            {!isReadOnly && (
-             <>
-               <AddTeamMemberModal 
+             <AddTeamMemberModal 
                   teamId={team.id} 
                   projectId={team.projectId} 
                   currentMembers={team.members.map((m: any) => m.participantId)} 
                />
-               <SubmitProposalModal teamId={team.id} teamName={team.name} />
-             </>
            )}
         </div>
       </div>

@@ -51,7 +51,8 @@ export function TeamFilters({ projects }: TeamFiltersProps) {
     }, 500)
 
     return () => clearTimeout(handler)
-  }, [search, projectId, status, fiscalYear, pathname, router, searchParams])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, projectId, status, fiscalYear, pathname, router])
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-3">

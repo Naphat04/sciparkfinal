@@ -52,7 +52,7 @@ export async function GET(
       const message = error instanceof Error ? error.message : "Failed to fetch participant"
       return NextResponse.json({ error: message }, { status: 500 })
     }
-  }, { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"] })
+  }, { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"], permission: "projects:read" })
 }
 
 export async function PUT(
@@ -132,5 +132,5 @@ export async function PUT(
       console.error("/api/participants/[id] PUT error", error)
       return NextResponse.json({ error: "Failed to update participant" }, { status: 500 })
     }
-  }, { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"] })
+  }, { roles: ["PROJECT_MANAGER"] })
 }

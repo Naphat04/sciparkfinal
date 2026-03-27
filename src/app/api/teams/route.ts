@@ -44,5 +44,5 @@ export async function POST(req: NextRequest) {
       console.error("/api/teams error", error)
       return NextResponse.json({ error: "Failed to create team" }, { status: 500 })
     }
-  }, { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"] })
+  }, { roles: ["PROJECT_MANAGER"] })
 }

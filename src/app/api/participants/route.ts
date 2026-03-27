@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
             email: body.email,
             phone: body.phone || null,
             name: body.name,
-            passwordHash: "temp",
+            passwordHash: "temp", // TODO: [PRODUCTION] Hash password properly before deployment
             role: "PARTICIPANT"
           }
         })
@@ -148,5 +148,5 @@ export async function POST(req: NextRequest) {
       console.error("/api/participants error", error)
       return NextResponse.json({ error: "Failed to create participant" }, { status: 500 })
     }
-  }, { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"] })
+  }, { roles: ["PROJECT_MANAGER"] })
 }

@@ -23,7 +23,7 @@ export async function createTeam(data: {
       }
     },
     include: {
-      _count: { select: { members: true, proposals: true } },
+      _count: { select: { members: true } },
       project: { select: { id: true, name: true } }
     }
   })
@@ -83,7 +83,7 @@ export async function getAllTeams(filters?: {
     where,
     include: {
       project: { select: { id: true, name: true } },
-      _count: { select: { members: true, proposals: true } }
+      _count: { select: { members: true } }
     },
     orderBy: { createdAt: "desc" }
   })
@@ -126,7 +126,7 @@ export async function getTeamById(id: string) {
           }
         }
       },
-      proposals: true
+
     }
   })
 }

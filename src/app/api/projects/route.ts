@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
             email: ctx.session.user.email,
             name: ctx.session.user.name,
             role: ctx.session.user.role,
-            passwordHash: "temp",
+            passwordHash: "temp", // TODO: [PRODUCTION] Hash password properly before deployment
           },
         })
 
@@ -97,6 +97,6 @@ export async function POST(req: NextRequest) {
         )
       }
     },
-    { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"] }
+    { roles: ["PROJECT_MANAGER"] }
   )
 }

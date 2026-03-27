@@ -32,5 +32,5 @@ export async function PATCH(
       console.error("/api/teams/[id] PATCH error", error)
       return NextResponse.json({ error: error.message || "Failed to update team" }, { status: 500 })
     }
-  }, { roles: ["SUPER_ADMIN", "PROJECT_MANAGER"] })
+  }, { roles: ["PROJECT_MANAGER"] })
 }

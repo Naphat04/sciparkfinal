@@ -20,7 +20,7 @@ type Participant = {
   id: string
   type: string
   createdAt: string | Date
-  user: { name?: string | null; email?: string }
+  user?: { name?: string | null; email?: string }
   studentProfile?: { studentId?: string; faculty?: string; program?: string; year?: number }
   lecturerProfile?: { faculty?: string; position?: string }
   researcherProfile?: { organization?: string; researchField?: string }
