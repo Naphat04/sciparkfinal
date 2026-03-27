@@ -168,7 +168,7 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
           disabled={isLoading || mode === "edit"}
           className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-primary/40"
         >
-          {PARTICIPANT_TYPES.filter((pt) => (mode === "add" ? pt.id !== "STUDENT" : true)).map((pt) => (
+          {PARTICIPANT_TYPES.map((pt) => (
             <option key={pt.id} value={pt.id}>
               {pt.label}
             </option>

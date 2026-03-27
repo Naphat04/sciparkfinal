@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { DollarSign, PieChart, BarChart, CheckCircle2, Clock, XCircle } from "lucide-react"
 import * as dashboardService from "@/services/dashboard.service"
 
 export const metadata: Metadata = {
@@ -98,52 +99,167 @@ export default async function DashboardPage() {
         </div>
         <div className="flex gap-2">
             <Button variant="outline">ดาวน์โหลดรายงาน</Button>
-            <Button
-              nativeButton={false}
-              render={
-                <Link href="/projects/create">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  สร้างโครงการใหม่
-                </Link>
-              }
-            />
         </div>
       </div>
 
       <Separator />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard 
           title="โครงการทั้งหมด" 
           icon={Briefcase} 
           value={stats.totalProjects} 
-          description="+12% จากเดือนที่แล้ว"
+          description="ระบบบ่มเพาะวิสาหกิจ"
           color="text-primary border-primary/20"
         />
         <StatCard 
-          title="โครงการที่ดำเนินการอยู่" 
-          icon={Activity} 
-          value={stats.activeProjects} 
-          description="โครงการที่อยู่ระหว่างการดำเนินงาน"
+          title="งบประมาณอุดหนุนรวม" 
+          icon={DollarSign} 
+          value={stats.totalBudget} 
+          description={`เฉลี่ย ${(stats.totalProjects ? stats.totalBudget / stats.totalProjects : 0).toLocaleString()} ฿ / โครงการ`}
           color="text-green-500 border-green-500/20"
-        />
-        <StatCard 
-          title="ทีมทั้งหมด" 
-          icon={Users} 
-          value={stats.totalTeams} 
-          description="+5 ทีมที่ลงทะเบียนใหม่"
-          color="text-blue-500 border-blue-500/20"
         />
         <StatCard 
           title="ผู้เข้าร่วมทั้งหมด" 
           icon={GraduationCap} 
           value={stats.totalParticipants} 
-          description="นักวิจัยและนักศึกษาในระบบ"
+          description="บุคลากรจากทุกมิติ"
           color="text-orange-500 border-orange-500/20"
+        />
+        <StatCard 
+          title="ทีมที่อนุมัติแล้ว" 
+          icon={CheckCircle2} 
+          value={stats.approvedTeams} 
+          description="ทีมที่เข้าร่วมอย่างเป็นทางการ"
+          color="text-emerald-500 border-emerald-500/20"
+        />
+        <StatCard 
+          title="ทีมที่รออนุมัติ" 
+          icon={Clock} 
+          value={stats.pendingTeams} 
+          description="อยู่ระหว่างการพิจารณา"
+          color="text-amber-500 border-amber-500/20"
+        />
+        <StatCard 
+          title="ทีมที่โดนปฏิเสธ" 
+          icon={XCircle} 
+          value={stats.rejectedTeams} 
+          description="คุณสมบัติไม่ผ่านเกณฑ์"
+          color="text-rose-500 border-rose-500/20"
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12 mt-4">
+        {/* Status Breakdown Chart */}
+        <Card className="lg:col-span-6 border-none shadow-sm bg-card/60 backdrop-blur-sm relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-5 transition-transform duration-500 group-hover:scale-110">
+             <BarChart className="h-24 w-24 text-primary" />
+          </div>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span className="p-1.5 bg-primary/10 rounded-md text-primary"><BarChart className="h-4 w-4" /></span>
+              สถานะโครงการ (Project Health)
+            </CardTitle>
+            <CardDescription>สัดส่วนความคืบหน้าของโครงการทั้งหมดในระบบ</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.projectsByStatus.length === 0 ? (
+                <div className="text-sm text-muted-foreground italic">ไม่มีข้อมูลสถานะโครงการ</div>
+              ) : (
+                <div className="flex w-full h-8 rounded-full overflow-hidden border border-border/50 shadow-inner">
+                  {stats.projectsByStatus.map((st) => {
+                    const percent = Math.round((st._count.id / stats.totalProjects) * 100) || 0
+                    let color = "bg-primary"
+                    if (st.status === "ACTIVE") color = "bg-green-500"
+                    if (st.status === "COMPLETED") color = "bg-blue-500"
+                    if (st.status === "CANCELLED") color = "bg-red-500"
+                    if (st.status === "DRAFT") color = "bg-muted-foreground/30"
+                    
+                    return (
+                      <div 
+                        key={st.status} 
+                        className={`${color} h-full transition-all duration-1000 ease-out flex items-center justify-center group/tooltip relative`}
+                        style={{ width: `${percent}%` }}
+                      >
+                         {percent > 10 && <span className="text-[10px] font-bold text-white shadow-sm mix-blend-overlay">{percent}%</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                {stats.projectsByStatus.map((st) => (
+                   <div key={st.status} className="flex flex-col gap-1 p-2 rounded-lg bg-background/40 border border-border/40">
+                      <div className="text-[10px] uppercase font-semibold text-muted-foreground shrink-0 truncate">{st.status}</div>
+                      <div className="text-lg font-black">{st._count.id}</div>
+                   </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Participant Breakdown Chart */}
+        <Card className="lg:col-span-6 border-none shadow-sm bg-card/60 backdrop-blur-sm relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-5 transition-transform duration-500 group-hover:scale-110">
+             <PieChart className="h-24 w-24 text-orange-500" />
+          </div>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span className="p-1.5 bg-orange-500/10 rounded-md text-orange-500"><PieChart className="h-4 w-4" /></span>
+              ผู้เข้าร่วม (Demographics)
+            </CardTitle>
+            <CardDescription>วิเคราะห์ประเภทของผู้ทำโครงการบ่มเพาะ</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.participantsByType.length === 0 ? (
+                <div className="text-sm text-muted-foreground italic">ไม่มีข้อมูลผู้เข้าร่วม</div>
+              ) : (
+                <div className="flex w-full h-8 rounded-full overflow-hidden border border-border/50 shadow-inner">
+                  {stats.participantsByType.map((pt, i) => {
+                    const percent = Math.round((pt._count.id / stats.totalParticipants) * 100) || 0
+                    const colors = ["bg-orange-500", "bg-purple-500", "bg-cyan-500", "bg-rose-500", "bg-amber-500"]
+                    const color = pt.type === "STUDENT" ? "bg-blue-500" 
+                               : pt.type === "ENTREPRENEUR" ? "bg-green-500"
+                               : pt.type === "RESEARCHER" ? "bg-purple-500"
+                               : colors[i % colors.length]
+                    
+                    return (
+                      <div 
+                        key={pt.type} 
+                        className={`${color} h-full transition-all duration-1000 ease-out flex items-center justify-center`}
+                        style={{ width: `${percent}%` }}
+                      >
+                         {percent > 10 && <span className="text-[10px] font-bold text-white shadow-sm mix-blend-overlay">{percent}%</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                {stats.participantsByType.map((pt) => {
+                   let label = pt.type
+                   if (pt.type === "STUDENT") label = "นักศึกษา"
+                   if (pt.type === "ENTREPRENEUR") label = "ผู้ประกอบการ"
+                   if (pt.type === "RESEARCHER") label = "นักวิจัย"
+                   if (pt.type === "LECTURER") label = "อาจารย์"
+
+                   return (
+                     <div key={pt.type} className="flex flex-col gap-1 p-2 rounded-lg bg-background/40 border border-border/40">
+                        <div className="text-[10px] font-semibold text-muted-foreground shrink-0 truncate">{label}</div>
+                        <div className="text-lg font-black">{pt._count.id}</div>
+                     </div>
+                   )
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12 mt-2">
         <Card className="lg:col-span-7 border-none shadow-sm bg-card/50">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">

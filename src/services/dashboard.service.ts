@@ -1,18 +1,41 @@
 import prisma from "@/lib/prisma"
 
 export async function getDashboardStats() {
-  const [totalProjects, totalTeams, totalParticipants, activeProjects] = await Promise.all([
+  const [
+    totalProjects, 
+    totalTeams, 
+    approvedTeams,
+    pendingTeams,
+    rejectedTeams,
+    totalParticipants, 
+    activeProjects, 
+    budgetAgg,
+    projectsByStatus,
+    participantsByType
+  ] = await Promise.all([
     prisma.project.count(),
     prisma.team.count(),
+    prisma.team.count({ where: { status: "APPROVED" } }),
+    prisma.team.count({ where: { status: "PENDING" } }),
+    prisma.team.count({ where: { status: "REJECTED" } }),
     prisma.participant.count(),
-    prisma.project.count({ where: { status: "ACTIVE" } })
+    prisma.project.count({ where: { status: "ACTIVE" } }),
+    prisma.project.aggregate({ _sum: { budget: true } }),
+    prisma.project.groupBy({ by: ["status"], _count: { id: true } }),
+    prisma.participant.groupBy({ by: ["type"], _count: { id: true } })
   ])
 
   return {
     totalProjects,
     totalTeams,
+    approvedTeams,
+    pendingTeams,
+    rejectedTeams,
     totalParticipants,
-    activeProjects
+    activeProjects,
+    totalBudget: budgetAgg._sum.budget || 0,
+    projectsByStatus,
+    participantsByType
   }
 }
 
