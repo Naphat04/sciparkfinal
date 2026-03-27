@@ -15,7 +15,10 @@ export function hasPermission(user: AuthenticatedUser, permission: Permission): 
  * Currently, we use exact matching or hierarchical check for ADMINs.
  */
 export function hasRole(user: AuthenticatedUser, allowedRoles: UserRole[]): boolean {
-  // Strict role matching — no implicit "God mode" bypass
+  // SUPER_ADMIN can do anything
+  if (user.role === "SUPER_ADMIN") return true
+  
+  // Strict role matching for other roles
   return allowedRoles.includes(user.role)
 }
 

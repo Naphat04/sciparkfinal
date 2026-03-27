@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { ConfirmDelete } from "@/components/features/confirm-delete"
 
 const typeMap: Record<string, { label: string; color: string }> = {
+  STUDENT: { label: "นักศึกษา", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
   PROJECT_MANAGER: { label: "ผู้จัดการโครงการ", color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" },
   LECTURER: { label: "อาจารย์", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
   RESEARCHER: { label: "นักวิจัย", color: "bg-green-500/10 text-green-500 border-green-500/20" },
@@ -30,6 +31,10 @@ type Participant = {
 }
 
 function getParticipantDetails(p: Participant) {
+  if (p.type === "STUDENT") {
+    const prof = p.studentProfile
+    return prof ? `${prof.faculty || "ไม่ระบุคณะ"} - ${prof.program || "ไม่ระบุสาขา"} (ปี ${prof.year || "?"})` : "-"
+  }
   if (p.type === "LECTURER") {
     const prof = p.lecturerProfile
     return prof ? `${prof.position || "อาจารย์/ที่ปรึกษา"} ณ ${prof.faculty || "ไม่ระบุคณะ"}` : "-"
@@ -109,7 +114,7 @@ export function ParticipantsContent({ participants }: { participants: Participan
                         </Link>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground font-mono">
-                        -
+                        {p.type === "STUDENT" ? (p.studentProfile?.studentId || "-") : "-"}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground font-mono">{p.user?.email || "-"}</TableCell>
                       <TableCell>

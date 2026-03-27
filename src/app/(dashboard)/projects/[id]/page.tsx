@@ -392,8 +392,14 @@ export default async function ProjectDetailPage({ params }: Props) {
                 type: p.type,
                 createdAt: p.createdAt
               }))}
+              availableParticipants={allParticipants.map((p) => ({
+                id: p.id,
+                type: p.type,
+                user: { name: p.user?.name || null, email: p.user.email }
+              }))}
               projectId={resolvedParams.id}
               isParticipant={isReadOnly}
+              hideStudents={true}
             />
           </div>
         </TabsContent>

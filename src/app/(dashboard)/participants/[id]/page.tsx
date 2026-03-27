@@ -41,7 +41,7 @@ type ParticipantDetail = {
 }
 
 const typeMap: Record<string, { label: string; color: string }> = {
-  PROJECT_MANAGER: { label: "ผู้จัดการโครงการ", color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" },
+  STUDENT: { label: "นักศึกษา", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
   PROJECT_MANAGER: { label: "ผู้จัดการโครงการ", color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" },
   LECTURER: { label: "อาจารย์", color: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
   RESEARCHER: { label: "นักวิจัย", color: "bg-green-500/10 text-green-500 border-green-500/20" },
@@ -106,7 +106,26 @@ export default async function ParticipantDetailPage({ params }: Props) {
               <CardDescription>รายละเอียดตามประเภทของผู้เข้าร่วม</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-
+              {participant.type === "STUDENT" && (
+                <div className="grid gap-2">
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">รหัสนักศึกษา</span>
+                    <span className="font-medium">{participant.studentProfile?.studentId || "-"}</span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">คณะ</span>
+                    <span className="font-medium">{participant.studentProfile?.faculty || "-"}</span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">สาขา</span>
+                    <span className="font-medium">{participant.studentProfile?.program || "-"}</span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">ชั้นปี</span>
+                    <span className="font-medium">{participant.studentProfile?.year ?? "-"}</span>
+                  </div>
+                </div>
+              )}
 
               {participant.type === "LECTURER" && (
                 <div className="grid gap-2">

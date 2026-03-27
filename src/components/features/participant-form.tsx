@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 
 const PARTICIPANT_TYPES = [
+  { id: "STUDENT", label: "นักศึกษา" },
   { id: "PROJECT_MANAGER", label: "ผู้จัดการโครงการ" },
   { id: "ENTREPRENEUR", label: "ผู้ประกอบการ" },
   { id: "RESEARCHER", label: "นักวิจัย" },
@@ -45,7 +46,7 @@ export function ParticipantForm({ onSubmit, initialData, isLoading = false, mode
   const [email, setEmail] = useState(initialData?.email || initialData?.user?.email || "")
   const [phone, setPhone] = useState(initialData?.phone || initialData?.user?.phone || "")
   const [type, setType] = useState(
-    initialData?.type || "ENTREPRENEUR"
+    initialData?.type || "STUDENT"
   )
   const [studentId, setStudentId] = useState(initialData?.studentProfile?.studentId || "")
   const [faculty, setFaculty] = useState(initialData?.studentProfile?.faculty || initialData?.lecturerProfile?.faculty || "")

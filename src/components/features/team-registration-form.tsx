@@ -17,6 +17,7 @@ type Project = {
 type Participant = {
   id: string
   user: { name: string | null; email: string }
+  studentProfile?: { studentId: string } | null
 }
 
 type Props = {
@@ -30,6 +31,7 @@ export function TeamRegistrationForm({ projects, participants, defaultProjectId 
   const [teamName, setTeamName] = useState("")
   const [projectId, setProjectId] = useState(defaultProjectId || "")
   const [leaderId, setLeaderId] = useState("")
+  const [leaderSearch, setLeaderSearch] = useState("")
   const [memberSearch, setMemberSearch] = useState("")
   const [memberIds, setMemberIds] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -39,9 +41,22 @@ export function TeamRegistrationForm({ projects, participants, defaultProjectId 
     const q = memberSearch.trim().toLowerCase()
     if (!q) return participants
     return participants.filter((p) =>
-      p.user.name?.toLowerCase().includes(q) || p.user.email?.toLowerCase().includes(q)
+      p.user.name?.toLowerCase().includes(q) || 
+      p.user.email?.toLowerCase().includes(q) ||
+      p.studentProfile?.studentId?.toLowerCase().includes(q)
     )
   }, [memberSearch, participants])
+
+  const filteredLeaders = useMemo(() => {
+    const q = leaderSearch.trim().toLowerCase()
+    if (!q) return participants
+    return participants.filter((p) =>
+      p.id === leaderId || // Always keep selected leader
+      p.user.name?.toLowerCase().includes(q) || 
+      p.user.email?.toLowerCase().includes(q) ||
+      p.studentProfile?.studentId?.toLowerCase().includes(q)
+    )
+  }, [leaderSearch, participants, leaderId])
 
   const toggleMember = (id: string) => {
     setMemberIds((prev) =>
@@ -135,19 +150,28 @@ export function TeamRegistrationForm({ projects, participants, defaultProjectId 
 
           <div className="grid gap-2">
             <Label htmlFor="leader">Leader *</Label>
-            <select
-              id="leader"
-              value={leaderId}
-              onChange={(event) => setLeaderId(event.target.value)}
-              className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-primary/40"
-            >
-              <option value="">-- Choose a leader --</option>
-              {participants.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.user.name || "Unknown"} ({p.user.email})
-                </option>
-              ))}
-            </select>
+            <div className="flex flex-col gap-2">
+              <Input
+                id="leaderSearch"
+                value={leaderSearch}
+                onChange={(e) => setLeaderSearch(e.target.value)}
+                placeholder="Search leader by name, email or ID..."
+                className="h-9 text-xs"
+              />
+              <select
+                id="leader"
+                value={leaderId}
+                onChange={(event) => setLeaderId(event.target.value)}
+                className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-primary/40"
+              >
+                <option value="">-- Choose a leader --</option>
+                {filteredLeaders.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.user.name || "Unknown"} {p.studentProfile?.studentId ? `(${p.studentProfile.studentId} - ${p.user.email})` : `(${p.user.email})`}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="grid gap-2">
@@ -156,7 +180,7 @@ export function TeamRegistrationForm({ projects, participants, defaultProjectId 
               id="memberSearch"
               value={memberSearch}
               onChange={(e) => setMemberSearch(e.target.value)}
-              placeholder="Search by name or email"
+              placeholder="Search by name, email or student ID"
             />
             <div className="max-h-56 overflow-y-auto rounded-md border border-input bg-background p-2">
               {filteredParticipants.map((p) => (
@@ -167,7 +191,9 @@ export function TeamRegistrationForm({ projects, participants, defaultProjectId 
                     onChange={() => toggleMember(p.id)}
                     className="h-4 w-4 rounded border-muted-foreground focus:ring-primary"
                   />
-                  <span className="text-sm">{p.user.name || "Unknown"} ({p.user.email})</span>
+                  <span className="text-sm">
+                    {p.user.name || "Unknown"} {p.studentProfile?.studentId ? `(${p.studentProfile.studentId} - ${p.user.email})` : `(${p.user.email})`}
+                  </span>
                 </label>
               ))}
               {filteredParticipants.length === 0 && (

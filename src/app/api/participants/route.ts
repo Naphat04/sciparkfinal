@@ -9,22 +9,33 @@ import * as participantService from "@/services/participant.service"
  * Query param: projectId
  */
 export async function GET(req: NextRequest) {
-  return withAuth(req, async () => {
-    const { searchParams } = new URL(req.url)
-    const projectId = searchParams.get("projectId")
+  return withAuth(
+    req,
+    async (req, ctx) => {
+      const { session } = ctx
+      const { searchParams } = new URL(req.url)
+      const projectId = searchParams.get("projectId")
 
-    if (!projectId) {
-      return NextResponse.json({ error: "projectId is required" }, { status: 400 })
-    }
+      try {
+        if (projectId) {
+          const participants = await participantService.getParticipantsByProject(projectId)
+          return NextResponse.json(participants)
+        }
 
-    try {
-      const participants = await participantService.getParticipantsByProject(projectId)
-      return NextResponse.json(participants)
-    } catch (error: any) {
-      console.error("/api/participants GET error", error)
-      return NextResponse.json({ error: error.message || "Failed to fetch participants" }, { status: 500 })
-    }
-  }, { permission: "projects:read" })
+        // Registry view (all participants) - Restricted to PMs for now
+        if (session?.user?.role !== "PROJECT_MANAGER" && session?.user?.role !== "SUPER_ADMIN") {
+          return NextResponse.json({ error: "Access denied" }, { status: 403 })
+        }
+
+        const participants = await participantService.getAllParticipants()
+        return NextResponse.json(participants)
+      } catch (error: any) {
+        console.error("/api/participants GET error", error)
+        return NextResponse.json({ error: error.message || "Failed to fetch participants" }, { status: 500 })
+      }
+    },
+    { permission: "projects:read" }
+  )
 }
 
 /**
@@ -33,7 +44,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return withAuth(req, async () => {
     const body = await req.json()
-    const allowedTypes = ["LECTURER", "RESEARCHER", "ENTREPRENEUR", "PROJECT_MANAGER"]
+    const allowedTypes = ["STUDENT", "LECTURER", "RESEARCHER", "ENTREPRENEUR", "PROJECT_MANAGER"]
 
     if (!body.name || !body.email || !body.type) {
       return NextResponse.json({ error: "Missing required fields (name, email, type)" }, { status: 400 })
