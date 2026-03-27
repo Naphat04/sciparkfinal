@@ -515,7 +515,6 @@ function SidebarMenuButton({
   const { isMobile, state } = useSidebar()
   const comp = useRender({
     defaultTagName: "button",
-    nativeButton,
     props: mergeProps<"button">(
       {
         className: cn(sidebarMenuButtonVariants({ variant, size }), className),

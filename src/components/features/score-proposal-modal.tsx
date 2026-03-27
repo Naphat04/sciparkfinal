@@ -22,9 +22,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 const formSchema = z.object({
-  score: z.coerce.number().min(0, "Min score is 0").max(100, "Max score is 100"),
+  score: z.number().min(0, "Min score is 0").max(100, "Max score is 100"),
   comments: z.string().min(10, "Please provide at least 10 characters of feedback"),
 })
+
+type FormSchemaType = {
+  score: number
+  comments: string
+}
 
 type Props = {
   proposalId: string
@@ -36,7 +41,7 @@ export function ScoreProposalModal({ proposalId, proposalTitle }: Props) {
   const [loading, setLoading] = React.useState(false)
   const router = useRouter()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       score: 70,
@@ -44,7 +49,7 @@ export function ScoreProposalModal({ proposalId, proposalTitle }: Props) {
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormSchemaType) {
     setLoading(true)
     try {
       const response = await fetch("/api/evaluations", {

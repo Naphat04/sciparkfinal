@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma"
-import { ProposalStatus } from "@prisma/client"
+
+type ProposalStatus = "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "REJECTED"
 
 export async function createProposal(data: {
   teamId: string

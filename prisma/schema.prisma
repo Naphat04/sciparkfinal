@@ -16,6 +16,7 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
+  phone         String?
   passwordHash  String
   name          String?
   role          String    @default("PARTICIPANT")
@@ -26,8 +27,6 @@ model User {
   managedProjects Project[] @relation("ProjectManager")
   evaluations   Evaluation[]
 }
-
-// --- PARTICIPANT MANAGEMENT ---
 
 // ParticipantType: "STUDENT", "LECTURER", "RESEARCHER", "ENTREPRENEUR"
 model Participant {
@@ -43,6 +42,9 @@ model Participant {
 
   teamMemberships  TeamMember[]
   
+  projectId        String?
+  project          Project?        @relation("ProjectParticipants", fields: [projectId], references: [id])
+
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 }
@@ -90,6 +92,7 @@ model Project {
   description String?
   startDate   DateTime
   endDate     DateTime
+  fiscalYear  String?
   status      String        @default("DRAFT")
   budget      Float?        @default(0)
   maxTeams    Int?          @default(0)
@@ -98,9 +101,29 @@ model Project {
   manager     User          @relation("ProjectManager", fields: [managerId], references: [id])
   
   teams       Team[]
+  awards      ProjectAward[]
+  milestones  ProjectTimelineMilestone[]
+  participants Participant[] @relation("ProjectParticipants")
   
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+}
+
+model ProjectTimelineMilestone {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  dueDate     DateTime
+  status      String   @default("PLANNED") // "PLANNED" | "IN_PROGRESS" | "DUE" | "DONE" | "DELAYED"
+  order       Int      @default(0)
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId, dueDate])
 }
 
 // TeamStatus: "PENDING", "APPROVED", "REJECTED"
@@ -115,9 +138,26 @@ model Team {
   
   members     TeamMember[]
   proposals   Proposal[]
+  awards      ProjectAward[]
   
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+}
+
+model ProjectAward {
+  id        String   @id @default(cuid())
+  projectId String
+  teamId    String
+  rank      Int      // 1, 2, 3
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, rank])
+  @@unique([projectId, teamId])
 }
 
 // TeamRole: "LEADER", "MEMBER", "ADVISOR"

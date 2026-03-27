@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import * as teamService from "@/services/team.service"
+import * as projectService from "@/services/project.service"
+import { TeamFilters } from "@/components/features/team-filters"
 
 export const metadata: Metadata = {
   title: "ทีมทั้งหมด | Sci-Park",
@@ -27,8 +29,26 @@ const statusBadgeStyles: Record<string, string> = {
   REJECTED: "bg-red-500/10 text-red-500 border-red-500/20",
 }
 
-export default async function TeamsPage() {
-  const teams = await teamService.getAllTeams()
+interface PageProps {
+  searchParams: Promise<{
+    search?: string
+    projectId?: string
+    status?: string
+    fiscalYear?: string
+  }>
+}
+
+export default async function TeamsPage({ searchParams }: PageProps) {
+  const sp = await searchParams
+  const [teams, projects] = await Promise.all([
+    teamService.getAllTeams({
+      search: sp.search,
+      projectId: sp.projectId === "all" ? undefined : sp.projectId,
+      status: sp.status === "all" ? undefined : sp.status,
+      fiscalYear: sp.fiscalYear === "all" ? undefined : sp.fiscalYear,
+    }),
+    projectService.getAllProjects()
+  ])
 
   return (
     <div className="flex flex-col gap-8 pb-20">
@@ -42,10 +62,12 @@ export default async function TeamsPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="font-bold border-2">นำข้อมูลออก</Button>
-          <Button className="font-bold gap-2">
-            <PlusCircle className="h-4 w-4" />
-            ลงทะเบียนทีม
-          </Button>
+          <Link href="/teams/create">
+            <Button className="font-bold gap-2">
+              <PlusCircle className="h-4 w-4" />
+              ลงทะเบียนทีม
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -90,21 +112,9 @@ export default async function TeamsPage() {
 
       {/* Team Listing Grid */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold tracking-tight">รายชื่อทีมที่ลงทะเบียน</h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/50" />
-              <Input
-                type="search"
-                placeholder="ค้นหาทีม..."
-                className="w-[280px] pl-9 bg-background/50 h-9 border-none ring-1 ring-primary/10 focus-visible:ring-primary/20"
-              />
-            </div>
-            <Button variant="outline" size="icon" className="h-9 w-9 border-none ring-1 ring-primary/10 hover:ring-primary/20">
-              <Filter className="h-4 w-4" />
-            </Button>
-          </div>
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between mb-6 gap-4">
+          <h2 className="text-xl font-bold tracking-tight whitespace-nowrap">รายชื่อทีมที่ลงทะเบียน</h2>
+          <TeamFilters projects={projects.map(p => ({ id: p.id, name: p.name, fiscalYear: (p as any).fiscalYear || null }))} />
         </div>
 
         {teams.length === 0 ? (

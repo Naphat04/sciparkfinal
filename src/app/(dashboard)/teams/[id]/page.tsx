@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/table"
 import { SubmitProposalModal } from "@/components/features/submit-proposal-modal"
 import { SubmitProposalAction } from "@/components/features/proposal-actions"
+import { AddTeamMemberModal } from "@/components/features/add-team-member-modal"
+import { TeamStatusActions } from "@/components/features/team-status-actions"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -65,6 +67,10 @@ export default async function TeamDetailPage({ params }: Props) {
   }
 
   const leader = team.members.find((m: any) => m.role === "LEADER")
+  const awards = ((team as any).awards ?? []) as { rank: number; project: { id: string; name: string } }[]
+
+  const rankLabel = (rank: number) =>
+    rank === 1 ? "รางวัลที่ 1" : rank === 2 ? "รางวัลที่ 2" : rank === 3 ? "รางวัลที่ 3" : `รางวัลที่ ${rank}`
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,10 +87,34 @@ export default async function TeamDetailPage({ params }: Props) {
            </div>
         </div>
         <div className="flex items-center gap-2">
-           <Button variant="outline" size="sm">Invite Member</Button>
+           <AddTeamMemberModal 
+              teamId={team.id} 
+              projectId={team.projectId} 
+              currentMembers={team.members.map((m: any) => m.participantId)} 
+           />
            <SubmitProposalModal teamId={team.id} teamName={team.name} />
         </div>
       </div>
+
+      {/* Status Banner */}
+      {team.status !== "APPROVED" && (
+        <div className={`flex items-center justify-between px-5 py-3 rounded-xl text-sm font-medium ${
+          team.status === "PENDING"
+            ? "bg-amber-500/10 border border-amber-500/20 text-amber-600"
+            : "bg-red-500/10 border border-red-500/20 text-red-600"
+        }`}>
+          <span>
+            {team.status === "PENDING" ? "⏳ ทีมนี้รอการอนุมัติจากผู้ดูแลระบบ" : "❌ ทีมนี้ถูกปฏิเสธ"}
+          </span>
+          <TeamStatusActions teamId={team.id} currentStatus={team.status} />
+        </div>
+      )}
+      {team.status === "APPROVED" && (
+        <div className="flex items-center justify-between px-5 py-3 rounded-xl text-sm font-medium bg-green-500/10 border border-green-500/20 text-green-600">
+          <span>✅ ทีมนี้ได้รับการอนุมัติแล้ว</span>
+          <TeamStatusActions teamId={team.id} currentStatus={team.status} />
+        </div>
+      )}
 
       <Separator />
 
@@ -96,9 +126,11 @@ export default async function TeamDetailPage({ params }: Props) {
                    <CardTitle className="text-lg">Team Members</CardTitle>
                    <CardDescription>Members currently participating in this innovation track.</CardDescription>
                 </div>
-                <Button variant="outline" size="icon-sm">
-                   <UserPlus className="h-4 w-4" />
-                </Button>
+                <AddTeamMemberModal 
+                  teamId={team.id} 
+                  projectId={team.projectId} 
+                  currentMembers={team.members.map((m: any) => m.participantId)} 
+                />
              </CardHeader>
              <CardContent className="px-0">
                 <Table>
@@ -215,6 +247,46 @@ export default async function TeamDetailPage({ params }: Props) {
         </div>
 
         <div className="md:col-span-4 flex flex-col gap-6">
+           {awards.length > 0 && (
+             <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50/80 via-card/70 to-primary/5 dark:from-amber-500/10 dark:via-card/60 dark:to-primary/10 overflow-hidden">
+               <CardHeader className="pb-3">
+                 <CardTitle className="text-base font-bold tracking-tight flex items-center justify-between">
+                   <span>รางวัลของทีม</span>
+                   <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-amber-500/20 text-amber-700 dark:text-amber-300 px-2 py-1 rounded-full border border-amber-500/30">
+                     🏆 {awards.length} รางวัล
+                   </span>
+                 </CardTitle>
+                 <CardDescription>
+                   รายการรางวัลทั้งหมดที่ทีมนี้ได้รับ
+                 </CardDescription>
+               </CardHeader>
+               <CardContent className="pt-0">
+                 <div className="space-y-3">
+                   {awards.map((a) => (
+                     <Link
+                       key={`${a.project.id}-${a.rank}`}
+                       href={`/projects/${a.project.id}`}
+                       className="group flex items-start justify-between gap-3 rounded-xl border border-border/60 bg-background/60 px-4 py-3 hover:border-primary/50 hover:bg-background transition-all"
+                     >
+                       <div className="grid gap-1">
+                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700 dark:text-amber-300">
+                           {rankLabel(a.rank)}
+                         </span>
+                         <span className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.12em]">
+                           โครงการ
+                         </span>
+                         <span className="text-sm font-extrabold group-hover:text-primary transition-colors line-clamp-2">
+                           {a.project.name}
+                         </span>
+                       </div>
+                       <ExternalLink className="h-4 w-4 opacity-40 group-hover:opacity-100 mt-1" />
+                     </Link>
+                   ))}
+                 </div>
+               </CardContent>
+             </Card>
+           )}
+
            <Card className="border-none shadow-sm bg-card/50 overflow-hidden group">
               <CardHeader className="bg-primary/5 pb-4 border-b group-hover:bg-primary/10 transition-colors">
                  <CardTitle className="text-base font-bold tracking-tight">Team Authority</CardTitle>

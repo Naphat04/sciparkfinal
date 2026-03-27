@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { getMockSession } from "@/lib/auth-utils"
 import { AppSidebar } from "@/components/dashboard/app-sidebar"
 import {
   SidebarInset,
@@ -20,14 +21,17 @@ export const metadata: Metadata = {
   description: "Enterprise Innovation Management",
 }
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await getMockSession()
+  const user = session?.user
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={user} />
       <SidebarInset>
         {/* Top Header */}
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -51,8 +55,11 @@ export default function DashboardLayout({
           
           <div className="flex items-center gap-4">
             {/* Reserved for global search or notifications */}
-            <div className="text-xs text-muted-foreground hidden sm:block">
-              Welcome, <span className="font-medium text-foreground">Sci-Park Admin</span>
+            <div className="text-xs text-muted-foreground hidden sm:flex items-center gap-2">
+              <span>Welcome, <strong className="font-semibold text-foreground">{user?.name}</strong></span>
+              <span className="px-2 py-0.5 rounded bg-primary/10 text-primary uppercase font-bold tracking-wider">
+                {user?.role}
+              </span>
             </div>
           </div>
         </header>

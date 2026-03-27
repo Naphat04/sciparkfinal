@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client"
+export type UserRole = "SUPER_ADMIN" | "PROJECT_MANAGER" | "PARTICIPANT" | "JUDGE"
 
 export type AuthenticatedUser = {
   id: string

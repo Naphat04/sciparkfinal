@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getMockSession, hasRole, hasPermission } from "@/lib/auth-utils"
-import { UserRole } from "@prisma/client"
-import { Permission } from "@/types/auth"
+import { Permission, UserRole } from "@/types/auth"
 
 type HandlerContext = {
   params: Record<string, string>

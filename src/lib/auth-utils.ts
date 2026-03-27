@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client"
+import { UserRole } from "@/types/auth"
 import { RolePermissions, Permission, AuthenticatedUser } from "@/types/auth"
 
 /**
@@ -20,18 +20,36 @@ export function hasRole(user: AuthenticatedUser, allowedRoles: UserRole[]): bool
   return false
 }
 
+import { cookies } from "next/headers"
+
 /**
  * Mocking a session for current development Phase 2.
  * In a real app, this would be retrieved from NextAuth / Auth.js.
  */
 export async function getMockSession(): Promise<{ user: AuthenticatedUser } | null> {
-  // Simulating a SUPER_ADMIN for Phase 2/3 development.
+  let role = "SUPER_ADMIN"
+  let email = "admin@scipark.university"
+  let name = "Sci-Park Master Admin"
+  
+  try {
+    const cookieStore = await cookies()
+    const r = cookieStore.get("mock-auth-role")?.value
+    if (r) {
+      role = r
+      email = cookieStore.get("mock-auth-email")?.value || `${r.toLowerCase()}@scipark.university`
+      name = cookieStore.get("mock-auth-name")?.value || `Mock ${r}`
+    }
+  } catch (err) {
+    // If not in a context with cookies, gracefully fallback instead of erroring
+  }
+
+  // Simulating a role for Phase 2/3 development based on cookie.
   return {
     user: {
-      id: "admin-123",
-      email: "admin@scipark.university",
-      name: "Sci-Park Master Admin",
-      role: "SUPER_ADMIN"
+      id: `mock-${role.toLowerCase()}-id`,
+      email,
+      name,
+      role: role as UserRole
     }
   }
 }

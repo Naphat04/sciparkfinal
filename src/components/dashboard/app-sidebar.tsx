@@ -81,8 +81,18 @@ const data = {
   },
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user?: any
+}
+
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const pathname = usePathname()
+  
+  const currentUser = user ? {
+    name: user.name,
+    email: user.email,
+    avatar: "",
+  } : data.user
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -168,13 +178,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     size="lg"
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={data.user.avatar} alt={data.user.name} />
-                      <AvatarFallback className="rounded-lg">SC</AvatarFallback>
+                    <Avatar className="h-8 w-8 rounded-lg bg-primary/10 text-primary">
+                      <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+                      <AvatarFallback className="rounded-lg font-bold">{currentUser.name.substring(0,2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{data.user.name}</span>
-                      <span className="truncate text-xs">{data.user.email}</span>
+                      <span className="truncate font-semibold">{currentUser.name}</span>
+                      <span className="truncate text-xs">{currentUser.email}</span>
                     </div>
                     <ChevronRight className="ml-auto size-4" />
                   </SidebarMenuButton>
@@ -204,12 +214,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  variant="destructive"
+                  className="text-destructive focus:text-destructive focus:bg-destructive/10"
                   render={
-                    <div className="flex items-center gap-2">
+                    <Link href="/login" className="flex items-center gap-2 w-full cursor-pointer">
                       <LogOut className="size-4" />
-                      <span>ออกจากระบบ</span>
-                    </div>
+                      <span>เปลี่ยน Role / คืนค่าระบบ</span>
+                    </Link>
                   }
                 />
               </DropdownMenuContent>
