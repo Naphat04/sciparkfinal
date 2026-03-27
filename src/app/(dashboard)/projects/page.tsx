@@ -35,7 +35,7 @@ function getStatusColor(status: string) {
 export default async function ProjectsPage() {
   const projects = await projectService.getAllProjects()
   const session = await getMockSession()
-  const isParticipant = session?.user?.role === "PARTICIPANT"
+  const isReadOnly = session?.user?.role !== "PROJECT_MANAGER"
 
   return (
     <div className="flex flex-col gap-6">
@@ -46,7 +46,7 @@ export default async function ProjectsPage() {
             จัดการและติดตามโครงการนวัตกรรมและแผนการบ่มเพาะวิสาหกิจ
           </p>
         </div>
-        {!isParticipant && (
+        {!isReadOnly && (
           <Link href="/projects/create">
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />

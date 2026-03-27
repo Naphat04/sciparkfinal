@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import * as teamService from "@/services/team.service"
 import * as projectService from "@/services/project.service"
 import { TeamFilters } from "@/components/features/team-filters"
+import { getMockSession } from "@/lib/auth-utils"
 
 export const metadata: Metadata = {
   title: "ทีมทั้งหมด | Sci-Park",
@@ -39,6 +40,9 @@ interface PageProps {
 }
 
 export default async function TeamsPage({ searchParams }: PageProps) {
+  const session = await getMockSession()
+  const isReadOnly = session?.user?.role !== "PROJECT_MANAGER"
+
   const sp = await searchParams
   const [teams, projects] = await Promise.all([
     teamService.getAllTeams({
@@ -62,12 +66,14 @@ export default async function TeamsPage({ searchParams }: PageProps) {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="font-bold border-2">นำข้อมูลออก</Button>
-          <Link href="/teams/create">
-            <Button className="font-bold gap-2">
-              <PlusCircle className="h-4 w-4" />
-              ลงทะเบียนทีม
-            </Button>
-          </Link>
+          {!isReadOnly && (
+            <Link href="/teams/create">
+              <Button className="font-bold gap-2">
+                <PlusCircle className="h-4 w-4" />
+                ลงทะเบียนทีม
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 

@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import * as teamService from "@/services/team.service"
+import { getMockSession } from "@/lib/auth-utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { 
   Table, 
@@ -47,6 +48,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function TeamDetailPage({ params }: Props) {
   const resolvedParams = await params
   const team = await teamService.getTeamById(resolvedParams.id)
+  
+  const session = await getMockSession()
+  const isReadOnly = session?.user?.role !== "PROJECT_MANAGER"
 
   if (!team) {
     return (
@@ -87,12 +91,16 @@ export default async function TeamDetailPage({ params }: Props) {
            </div>
         </div>
         <div className="flex items-center gap-2">
-           <AddTeamMemberModal 
-              teamId={team.id} 
-              projectId={team.projectId} 
-              currentMembers={team.members.map((m: any) => m.participantId)} 
-           />
-           <SubmitProposalModal teamId={team.id} teamName={team.name} />
+           {!isReadOnly && (
+             <>
+               <AddTeamMemberModal 
+                  teamId={team.id} 
+                  projectId={team.projectId} 
+                  currentMembers={team.members.map((m: any) => m.participantId)} 
+               />
+               <SubmitProposalModal teamId={team.id} teamName={team.name} />
+             </>
+           )}
         </div>
       </div>
 
@@ -106,13 +114,13 @@ export default async function TeamDetailPage({ params }: Props) {
           <span>
             {team.status === "PENDING" ? "⏳ ทีมนี้รอการอนุมัติจากผู้ดูแลระบบ" : "❌ ทีมนี้ถูกปฏิเสธ"}
           </span>
-          <TeamStatusActions teamId={team.id} currentStatus={team.status} />
+          {!isReadOnly && <TeamStatusActions teamId={team.id} currentStatus={team.status} />}
         </div>
       )}
       {team.status === "APPROVED" && (
         <div className="flex items-center justify-between px-5 py-3 rounded-xl text-sm font-medium bg-green-500/10 border border-green-500/20 text-green-600">
           <span>✅ ทีมนี้ได้รับการอนุมัติแล้ว</span>
-          <TeamStatusActions teamId={team.id} currentStatus={team.status} />
+          {!isReadOnly && <TeamStatusActions teamId={team.id} currentStatus={team.status} />}
         </div>
       )}
 
@@ -139,7 +147,7 @@ export default async function TeamDetailPage({ params }: Props) {
                          <TableHead className="pl-6 font-mono text-[10px] tracking-widest uppercase">Name</TableHead>
                          <TableHead className="font-mono text-[10px] tracking-widest uppercase">Role</TableHead>
                          <TableHead className="font-mono text-[10px] tracking-widest uppercase">Type</TableHead>
-                         <TableHead className="text-right pr-6 font-mono text-[10px] tracking-widest uppercase">Action</TableHead>
+                         {!isReadOnly && <TableHead className="text-right pr-6 font-mono text-[10px] tracking-widest uppercase">Action</TableHead>}
                       </TableRow>
                    </TableHeader>
                    <TableBody>
@@ -164,11 +172,13 @@ export default async function TeamDetailPage({ params }: Props) {
                             <TableCell className="text-xs text-muted-foreground">
                                {member.participant.type}
                             </TableCell>
-                            <TableCell className="text-right pr-6">
-                               <Button variant="ghost" size="icon-sm">
-                                  <MoreHorizontal className="h-4 w-4" />
-                               </Button>
-                            </TableCell>
+                            {!isReadOnly && (
+                              <TableCell className="text-right pr-6">
+                                 <Button variant="ghost" size="icon-sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                 </Button>
+                              </TableCell>
+                            )}
                          </TableRow>
                       ))}
                    </TableBody>
@@ -187,7 +197,7 @@ export default async function TeamDetailPage({ params }: Props) {
                        <FileText className="h-10 w-10 text-muted-foreground/30 mb-3 group-hover:scale-110 group-hover:text-primary/40 transition-all duration-500" />
                        <div className="text-sm font-bold text-muted-foreground">No Submissions Found</div>
                        <p className="text-[11px] text-muted-foreground italic mb-4">You must create a proposal draft first.</p>
-                       <SubmitProposalModal teamId={team.id} teamName={team.name} />
+                       {!isReadOnly && <SubmitProposalModal teamId={team.id} teamName={team.name} />}
                     </div>
                  ) : (
                     <div className="space-y-3">

@@ -110,7 +110,7 @@ export function AddTeamMemberModal({ teamId, projectId, currentMembers }: Props)
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-[500px] border-none shadow-2xl bg-card">
+      <DialogContent className="sm:max-w-[500px] max-h-[90dvh] overflow-y-auto border-none shadow-2xl bg-card">
         <DialogHeader>
           <div className="bg-primary/10 text-primary w-fit p-3 rounded-full mb-2">
             <UserPlus className="h-6 w-6" />

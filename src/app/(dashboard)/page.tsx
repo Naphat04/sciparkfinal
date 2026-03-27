@@ -4,12 +4,19 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getMockSession } from "@/lib/auth-utils"
 
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { DollarSign, PieChart, BarChart, CheckCircle2, Clock, XCircle } from "lucide-react"
 import * as dashboardService from "@/services/dashboard.service"
+
+const statusThai: Record<string, string> = {
+  ACTIVE: "กำลังดำเนินการ",
+  COMPLETED: "เสร็จสิ้น",
+  CANCELLED: "ยกเลิกแล้ว",
+  DRAFT: "ฉบับร่าง",
+}
 
 export const metadata: Metadata = {
   title: "แผงควบคุมหลัก | Sci-Park",
@@ -191,7 +198,7 @@ export default async function DashboardPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
                 {stats.projectsByStatus.map((st) => (
                    <div key={st.status} className="flex flex-col gap-1 p-2 rounded-lg bg-background/40 border border-border/40">
-                      <div className="text-[10px] uppercase font-semibold text-muted-foreground shrink-0 truncate">{st.status}</div>
+                      <div className="text-[10px] uppercase font-semibold text-muted-foreground shrink-0 truncate">{statusThai[st.status] || st.status}</div>
                       <div className="text-lg font-black">{st._count.id}</div>
                    </div>
                 ))}

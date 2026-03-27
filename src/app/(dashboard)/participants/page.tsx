@@ -4,6 +4,7 @@ import * as participantService from "@/services/participant.service"
 import { Separator } from "@/components/ui/separator"
 import { AddParticipantModal } from "@/components/features/add-participant-modal"
 import { ParticipantsContent } from "@/app/(dashboard)/participants/_components/participants-content"
+import { getMockSession } from "@/lib/auth-utils"
 
 type ParticipantRow = {
   id: string
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
 }
 
 export default async function ParticipantsPage() {
+  const session = await getMockSession()
+  const isReadOnly = session?.user?.role !== "PROJECT_MANAGER"
   const participants = await participantService.getAllParticipants()
 
   return (
@@ -33,7 +36,7 @@ export default async function ParticipantsPage() {
             ดูและจัดการรายชื่อนักวิจัย นักศึกษา และผู้ประกอบการในโครงการ
           </p>
         </div>
-        <AddParticipantModal />
+        {!isReadOnly && <AddParticipantModal />}
       </div>
 
       <Separator />

@@ -80,7 +80,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   const allProjects = await projectService.getAllProjects()
   
   const session = await getMockSession()
-  const isParticipant = session?.user?.role === "PARTICIPANT"
+  const isReadOnly = session?.user?.role !== "PROJECT_MANAGER"
   
   const projectView = project as (typeof project & { awards?: AwardView[]; milestones?: MilestoneView[] }) | null
   const awards = projectView?.awards ?? []
@@ -130,7 +130,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap justify-end">
-          {!isParticipant && (
+          {!isReadOnly && (
             <>
               <ProjectStatusActions projectId={resolvedParams.id} currentStatus={project.status} />
               <ProjectEditModal
@@ -166,7 +166,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               แอดมินสามารถเลือกทีมที่ได้รางวัลที่ 1–3 ได้เอง
             </CardDescription>
           </div>
-          {!isParticipant && (
+          {!isReadOnly && (
             <ProjectAwardsModal
               projectId={resolvedParams.id}
               teams={teams.map((t) => ({ id: t.id, name: t.name }))}
@@ -292,7 +292,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               <ProjectTimelineBuilder
                 projectId={resolvedParams.id}
                 initialMilestones={milestones}
-                isParticipant={isParticipant}
+                isParticipant={isReadOnly}
               />
            </div>
         </TabsContent>
@@ -309,7 +309,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input placeholder="Search teams..." className="pl-9 w-[280px] bg-background/50 h-9" />
                    </div>
-                   {!isParticipant && (
+                   {!isReadOnly && (
                      <>
                        <LinkExistingTeamModal
                           projectId={resolvedParams.id}
@@ -393,7 +393,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 createdAt: p.createdAt
               }))}
               projectId={resolvedParams.id}
-              isParticipant={isParticipant}
+              isParticipant={isReadOnly}
             />
           </div>
         </TabsContent>
